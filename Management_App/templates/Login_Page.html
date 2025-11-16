@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Facebook — Log in or sign up</title>
+    <!-- load static -->
+    {% load static %}
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href='{% static "css/style.css" %}'>
+  </head>
+  <body>
+    <!-- HEADER (visually minimal; main content below) -->
+    <header class="site-header" role="banner" aria-hidden="true">
+      <!-- decorative header: logo appears in right column card -->
+    </header>
+
+    <!-- MAIN: two-column layout on desktop, single column on mobile -->
+    <main id="main" role="main">
+      <div class="layout">
+
+        <!-- LEFT: hero/illustration -->
+        <section class="hero" aria-label="Promotional message">
+          <!-- Logo & message on left side (desktop) -->
+          <div class="hero__content">
+            <!-- small decorative logo -->
+            <img class="hero__logo" src="{% static "image/logo.svg" %}" alt="Facebook logo">
+            <p class="hero__tag">Facebook helps you connect and share with the people in your life.</p>
+          </div>
+        </section>
+
+        <!-- RIGHT: auth area -->
+        <section class="auth" aria-labelledby="login-title">
+          <!-- login card -->
+          <div class="auth__card" role="region" aria-label="Login">
+            <!-- Logo placeholder -->
+            <div class="auth__logo">
+              <img src="{% static "image/logo.svg" %}" alt="Logo">
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="login-form" method="post" novalidate>
+
+              {% csrf_token %}
+
+              <h1 id="login-title" class="visually-hidden">Log in to Facebook</h1>
+
+              <style>
+
+              </style>
+              
+              <!-- Email/Phone -->
+              <div class="form-group">
+                <label for="email">Email or phone</label>
+                <input id="email" name="email" type="text" autocomplete="username" placeholder="Email or phone" required>
+                <div id="email-error" class="error-message">Invalid email address</div>
+              </div>
+
+              <!-- Password -->
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Password" required>
+                <div id="password-error" class="error-message">Invalid password</div>
+              </div>
+
+              <!-- Login button -->
+              <div class="form-actions">
+                <button id="login-button" class="btn btn-primary" type="submit" >Log In</button>
+              </div>
+
+              <!-- Forgotten password link -->
+              <div class="form-help"><a href="#" class="forgot">Forgotten password?</a></div>
+
+              <!-- Divider -->
+              <div class="divider" aria-hidden="true"><span class="line"></span><span class="or">OR</span><span class="line"></span></div>
+
+              <!-- Create account -->
+              <div class="create-account">
+                <!-- Open standalone Create_Account.html -->
+                <a id="open-signup" class="btn btn-create" href="register" role="button">Create New Account</a>
+              </div>
+
+              <!-- small footer text -->
+              <p class="auth__small">Create a Page for a celebrity, brand or business.</p>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- FOOTER: languages and policies -->
+    <footer class="site-footer" role="contentinfo">
+      <!-- language links -->
+      <div class="lang-links">
+        <a href="#">English (UK)</a>
+        <a href="#">Español</a>
+        <a href="#">Français (France)</a>
+        <a href="#">Deutsch</a>
+        <a href="#">العربية</a>
+        <a href="#">中文(简体)</a>
+        <a href="#">日本語</a>
+      </div>
+      <!-- policy links -->
+      <div class="policy-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Advertising</a>
+        <a href="#">Cookies</a>
+        <a href="#">More</a>
+      </div>
+    </footer>
+
+    <!-- SIGNUP MODAL -->
+    {% comment %} <div id="signup-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="signup-title">
+      <div class="modal__overlay" data-dismiss="modal" tabindex="-1"></div>
+      <div class="modal__panel" role="document">
+        <header class="modal__header">
+          <h2 id="signup-title">Create new account</h2>
+          <button class="modal__close" aria-label="Close" data-dismiss="modal">✕</button>
+        </header>
+        <section class="modal__body">
+          <form id="signup-form" action="#" method="post" novalidate>
+            <div class="form-row">
+              <div class="form-group form-half">
+                <label for="first">First name</label>
+                <input id="first" name="first" type="text" required>
+              </div>
+              <div class="form-group form-half">
+                <label for="last">Surname</label>
+                <input id="last" name="last" type="text" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="signup-email">Mobile number or email address</label>
+              <input id="signup-email" name="signupEmail" type="text" required>
+            </div>
+            <div class="form-group">
+              <label for="signup-pass">New password</label>
+              <input id="signup-pass" name="signupPass" type="password" required>
+            </div>
+            <div class="form-actions">
+              <button id="signup-submit" class="btn btn-primary" type="submit">Sign Up</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div> {% endcomment %}
+
+    <!-- App JS -->
+    <script src='{% static "js/app.js" %}' defer></script>
+  </body>
+</html>

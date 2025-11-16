@@ -1,0 +1,42 @@
+<!-- 
+EXACT CODE SNIPPETS FOR Facebook_Home.html UPDATES
+Copy and paste these sections into the appropriate lines
+-->
+
+<!-- ===== UPDATE 1: Add Mobile CSS Link ===== -->
+<!-- Location: Head section, after line 7 -->
+<!-- Add this line after the facebookhome.css link: -->
+
+<link rel="stylesheet" href='{% static "css/facebookhome-mobile.css" %}'>
+
+
+<!-- ===== UPDATE 2: Replace Navigation Icons with Links ===== -->
+<!-- Location: Lines 28-41 (in header-center div) -->
+<!-- Replace the entire header-center div with this: -->
+
+<div class="header-center">
+    <a href="{% url 'Homepage' %}" class="nav-icon active">
+        <i class="fas fa-home"></i>
+    </a>
+    <a href="#" class="nav-icon">
+        <i class="fas fa-play"></i>
+    </a>
+    <a href="#" class="nav-icon">
+        <i class="fas fa-store"></i>
+    </a>
+    <a href="#" class="nav-icon">
+        <i class="fas fa-users"></i>
+    </a>
+    <a href="#" class="nav-icon">
+        <i class="fas fa-gamepad"></i>
+    </a>
+</div>
+
+
+<!-- ===== UPDATE 3: Update User Profile Link ===== -->
+<!-- Location: Line 57 (in user-profile div) -->
+<!-- Replace this line: -->
+<!-- OLD: <a href="userprofile"><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a> -->
+
+<!-- WITH THIS: -->
+<a href="{% url 'User_Profile' %}"><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a>

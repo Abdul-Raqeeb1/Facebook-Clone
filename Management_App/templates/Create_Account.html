@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create a new account</title>
+  {% load static %}
+  <!-- Local stylesheet -->
+  <link rel="stylesheet" href='{% static "css/create_account.css" %}'>
+</head>
+<body>
+  <!-- Page wrapper (centers the popup) -->
+  <div class="page-wrap">
+
+    <!-- Popup card -->
+    <aside class="signup-card" role="dialog" aria-labelledby="signup-title" aria-modal="true">
+      <!-- Close button (visual only; no JS) -->
+      <button class="close-btn" type="button" aria-label="Close">✕</button>
+
+      <!-- Logo (text-style like Facebook) -->
+      <div class="logo text-center" aria-hidden="true">
+        <span class="fb-logo">facebook</span>
+      </div>
+
+      <!-- Heading -->
+      <header class="signup-heading">
+        <h1 id="signup-title">Create a new account</h1>
+        <p class="subtitle">It's quick and easy.</p>
+      </header>
+
+      <!-- Form (visual only) -->
+      <form class="signup-form" novalidate method='POST' action='/createaccount'>
+        {% csrf_token %}
+        <!-- Name row -->
+        <div class="name-row">
+          <div class="form-group half">
+            <label for="first">First name</label>
+            <input id="first" name="first" type="text" placeholder="First name" inputmode="text" />
+          </div>
+          <div class="form-group half">
+            <label for="surname">Surname</label>
+            <input id="surname" name="surname" type="text" placeholder="Surname" inputmode="text" />
+          </div>
+        </div>
+
+        <!-- Email / phone -->
+        <div class="form-group">
+          <label for="email">Mobile number or email address</label>
+          <input id="email" name="email" type="text" placeholder="Mobile number or email address" inputmode="email" />
+        </div>
+
+        <!-- New password -->
+        <div class="form-group">
+          <label for="password">New password</label>
+          <input id="password" name="password" type="password" placeholder="New password" />
+        </div>
+
+        <!-- Date of birth -->
+        <div class="form-group">
+          <label class="dob-label">Date of birth</label>
+          <div class="dob-row" aria-label="Date of birth">
+            <select name="day" id="day" aria-label="Day">
+              <option value="">Day</option>
+              <!-- small sample; you can expand or populate with JS if desired -->
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+            <select name="month" id="month" aria-label="Month">
+              <option value="">Month</option>
+              <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+            </select>
+            <select name="year" id="year" aria-label="Year">
+              <option value="">Year</option>
+              <option>2024</option><option>2023</option><option>2020</option><option>1995</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+          <label class="gender-label">Gender</label>
+          <div class="gender-row" role="radiogroup" aria-label="Gender">
+            <!-- Each input is placed before the label so input:checked + label works in CSS -->
+            <input type="radio" id="gender-f" name="gender" value="FA" class="gender-input" />
+            <label for="gender-f" class="gender-option">Female</label>
+
+            <input type="radio" id="gender-m" name="gender" value="MA" class="gender-input" />
+            <label for="gender-m" class="gender-option">Male</label>
+
+            <input type="radio" id="gender-c" name="gender" value="CU" class="gender-input" />
+            <label for="gender-c" class="gender-option">Custom</label>
+          </div>
+        </div>
+
+        <!-- Privacy / help text -->
+        <p class="privacy-note">
+          People who use our service may have uploaded your contact information to Facebook. <a href="#" class="inline-link">Learn more</a>.
+        </p>
+
+        <p class="terms-note">
+          By clicking Sign Up, you agree to our <a href="#" class="inline-link">Terms</a>, <a href="#" class="inline-link">Privacy Policy</a> and <a href="#" class="inline-link">Cookies Policy</a>.
+        </p>
+
+        <!-- Submit -->
+        <div class="signup-actions">
+          <a href='homepage' style='color:white;text-decoration:none;width: 80%;'><button class="btn-signup" type="submit">Sign Up </button></a>
+          <a href="login" class="already-link">Already have an account?</a>
+        </div>
+      </form>
+
+      <!-- Footer languages / links -->
+      <footer class="signup-footer" aria-hidden="true">
+        <a href="#">English (UK)</a>
+        <a href="#">اردو</a>
+        <a href="#">हिन्दी</a>
+        <a href="#">বাংলা</a>
+        <a href="#">ਪੰਜਾਬੀ</a>
+        <a href="#">Español</a>
+        <a href="#">Deutsch</a>
+      </footer>
+    </aside>
+  </div>
+</body>
+</html>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook</title>
+    {% load static %}
+    <link rel="stylesheet" href='{% static "css/facebookhome.css" %}'>
+    <link rel="stylesheet" href='{% static "css/facebookhome-mobile.css" %}'>
+    <link rel="stylesheet" href='{% static "css/hide-mobile-icons.css" %}'>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <!-- Left section -->
+        <div class="header-left">
+            <div class="logo">
+                <i class="fab fa-facebook"></i>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Facebook">
+            </div>
+        </div>
+
+        <!-- Center navigation -->
+        <div class="header-center">
+            <a href="{% url 'Homepage' %}" class="nav-icon active">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-play"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-store"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-users"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-gamepad"></i>
+            </a>
+        </div>
+
+        <!-- Right section -->
+        <div class="header-right">
+            <div class="action-button">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="action-button">
+                <i class="fab fa-facebook-messenger"></i>
+            </div>
+            <div class="action-button">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="user-profile">
+                <a href="{% url 'User_Profile' %}"><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-item">
+                <img src="{% static "image/contact1.jpeg" %}" alt="Profile" width="36" height="36" class="sidebar-item-imageProfile">
+                {% if request.user.is_authenticated %}
+                    <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                
+                {% endif %}
+            </div>
+            <div class="sidebar-item">
+                <i class="fas fa-play-circle"></i>
+                <span>Watch</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="fas fa-calendar"></i>
+                <span>Events</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="fas fa-user-friends"></i>
+                <span>Friends</span>
+            </div>
+            <div class="sidebar-item">
+                <i class="fas fa-clock"></i>
+                <span>Memories</span>
+            </div>
+        </aside>
+
+        <!-- Center Content -->
+        <section class="center-content">
+            <!-- Stories -->
+            <div class="stories">
+                <div class="story">
+                    <img src="{% static "image/contact1.jpeg" %}" alt="Story">
+                    <div class="story-user">Create Story</div>
+                </div>
+                <div class="story">
+                    <video src="{% static "videos/video-1.mp4" %}" alt="Story Video" width="120" height="200" controls></video>
+                    <div class="story-user">Tom Russo</div>
+                </div>
+                <div class="story">
+                    <video src="{% static "videos/video-2.mp4" %}" alt="Story Video" width="120" height="200" controls></video>
+                    <div class="story-user">Betty Chen</div>
+                </div>
+                <div class="story">
+                    <video src="{% static "videos/video-3.mp4" %}" alt="Story Video" width="120" height="200" controls></video>
+                    <div class="story-user">Dennis Han</div>
+                </div>
+            </div>
+
+            <!-- Create Post (form) -->
+            <form class="create-post" method="post" action="{% url 'Create_Post' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="post-input">
+                    <img src="{% static "image/contact1.jpeg" %}" class="sidebar-item-imageProfile" alt="Profile" width="40" height="40">
+                    <input type="text" name="quick_post_text" placeholder="What's on your mind, Josephine?">
+                </div>
+
+                <div class="post-actions">
+                    <div class="post-action" id="open-media-modal" role="button" tabindex="0" style="cursor:pointer">
+                        <i class="fas fa-video"></i>
+                        <span>Photo/Video</span>
+                    </div>
+                    <div class="post-action">
+                        <i class="fas fa-user-tag"></i>
+                        <span>Tag Friends</span>
+                    </div>
+                    <div class="post-action">
+                        <i class="fas fa-smile"></i>
+                        <span>Feeling/Activity</span>
+                    </div>
+                </div>
+
+                <!-- Hidden fallback inputs (used if user submits quick text post) -->
+                <input type="hidden" name="post_title" id="hidden_post_title" value="">
+                <input type="file" name="post_image" id="hidden_post_image" style="display:none">
+                <button type="submit" style="display:none">Submit</button>
+            </form>
+
+            <!-- Media modal (title + image upload + submit) -->
+            <div id="mediaModal" class="media-modal" aria-hidden="true" style="display:none;">
+                <div class="media-modal-backdrop" id="mediaModalBackdrop"></div>
+                <div class="media-modal-content" role="dialog" aria-modal="true" aria-labelledby="mediaModalTitle">
+                    <button class="media-modal-close" id="mediaModalClose" aria-label="Close">&times;</button>
+                    <h3 id="mediaModalTitle">Create Photo/Video Post</h3>
+                    <form id="mediaPostForm" method="post" action="{% url 'Create_Post' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div style="margin-bottom:8px;">
+                            <label for="post_title_input">Title</label>
+                            <input type="text" id="post_title_input" name="post_title" placeholder="Write a title..." style="width:100%; padding:8px; margin-top:4px;">
+                        </div>
+                        <div style="margin-bottom:8px;">
+                            <label for="post_image_input">Choose image/video</label>
+                            <input type="file" id="post_image_input" name="post_image" accept="image/*,video/*" style="display:block; margin-top:6px;">
+                        </div>
+                        <div id="mediaPreview" style="margin-bottom:8px; display:none;"></div>
+                        <div style="display:flex; gap:8px; justify-content:flex-end;">
+                            <button type="button" id="mediaCancel" class="btn btn-ghost">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Posts -->
+            <div class="posts">
+                {% for post in posts %}
+                <!-- Post 1 -->
+                 			<div class="post">
+				<div class="post-header">
+					<img src="{% static "image/contact1.jpeg" %}" alt="Profile" width="40" height="40">
+					<div class="post-info">
+						<h4>{{post.post_id.first_name}} {{post.post_id.last_name}}</h4>
+						<span>{{post.post_time}}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+						<p>{{ post.title_post }}</p>
+                        {% if post.post_image %}
+						                            
+			
+                            {% if  "mp4" in post.post_image.url  %}
+                            <video src="{{ post.post_image.url }}" controls style="width:100%; border-radius:8px; margin-top:8px;"></video>
+                            {% else %}
+							<img src="{{ post.post_image.url }}" alt="Post image" style="width:100%; border-radius:8px; margin-top:8px;">
+                            {% endif %}
+                            {% endif %}
+                            {% if post.post_image %}
+                                <div style="margin-top:6px; font-size:12px; color:#666">Views <span>{{ post.post_views }}</span></div>
+                            {% endif %}
+                    </div>
+                    <div class="post-actions" style="width:100%; display:flex; align-items:center; justify-content:space-around;">
+						<form method="post" action="{% url 'Like_Post' %}" style="display:inline;margin-left:8px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <button type="submit" class="post-action" style="background:none; border:none;">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>Like ({{ post.post_likes }})</span>
+                            </button>
+                        </form>
+                        <button type="button" class="post-action comment-toggle-btn" data-post-id="{{ post.id }}" style="background:none; border:none;">
+                            <i class="fas fa-comment"></i>
+                            <span>Comment</span>
+                        </button>
+                        <div class="post-action">
+                            <i class="fas fa-share"></i>
+                            <span>Share</span>
+                        </div>
+                    </div>
+                    <!-- Comments list -->
+					
+                    <div class="comments-container">
+                        {% for c in post.comments.all|slice:":5" %}
+                        <div class="comment">
+                            <strong style="font-size:13px">{{ c.user.first_name }} {{ c.user.last_name }}</strong>
+                            <div style="font-size:13px; color:#444">{{ c.comment_text }}</div>
+                            <div style="font-size:11px; color:#888">{{ c.created_at }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="no-comments">No comments yet</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Add comment form (hidden by default, toggle on comment icon click) -->
+                    <form method="post" action="{% url 'Add_Comment' %}" class="comment-form" id="comment-form-{{ post.id }}" style="display:none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" name="comment_text" placeholder="Write a comment..." style="width:80%; padding:8px; border-radius:16px; border:1px solid var(--border-gray);">
+                            <button type="submit" class="btn btn-ghost" style="margin-left:8px;width:20%;background: blue;color: white;">Send</button>
+                        </div>
+                    </form>
+                
+                </div>
+                
+
+                {% endfor %}
+
+
+                <!-- Post 2 -->
+                <div class="post">
+                    <div class="post-header">
+                        <img src="{% static "image/contact1.jpeg" %}" alt="Profile" width="40" height="40">
+                        <div class="post-info">
+                            <h4>Betty Chen</h4>
+                            <span>5 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>Check out this amazing video! 🎥</p>
+                        <video src="{% static "videos/video-1.mp4" %}" controls></video>
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span>Like</span>
+                        </div>
+                        <div class="post-action">
+                            <i class="fas fa-comment"></i>
+                            <span>Comment</span>
+                        </div>
+                        <div class="post-action">
+                            <i class="fas fa-share"></i>
+                            <span>Share</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar">
+            <!-- Sponsored -->
+            <div class="sponsored">
+                <h3>Sponsored</h3>
+                <div class="sponsored-item">
+                    <img src="{% static "image/sponsored1.jpeg" %}" alt="Lebo's Pizza">
+                    <div>
+                        <h4>Lebo's Pizza</h4>
+                        <p>Experience the trendy pizza spot in Palo Alto</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts -->
+            <div class="contacts">
+                <h3>Contacts</h3>
+                <div class="contact-item">
+                    <img src="{% static "image/contact1.jpeg" %}" alt="Dennis Han">
+                    <span>Dennis Han</span>
+                </div>
+                <div class="contact-item">
+                    <img src="{% static "image/contact2.jpeg" %}" alt="Eric Jones">
+                    <span>Eric Jones</span>
+                </div>
+                <div class="contact-item">
+                    <img src="{% static "image/contact3.jpeg" %}" alt="Cynthia Lopez">
+                    <span>Cynthia Lopez</span>
+                </div>
+                <div class="contact-item">
+                    <img src="{% static "image/contact4.jpeg" %}" alt="Betty Chen">
+                    <span>Betty Chen</span>
+                </div>
+                <div class="contact-item">
+                    <img src="{% static "image/contact2.jpeg" %}" alt="Tina Lim">
+                    <span>Tina Lim</span>
+                </div>
+                <div class="contact-item">
+                    <img src="{% static "image/contact1.jpeg" %}" alt="Molly Carter">
+                    <span>Molly Carter</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Media modal script -->
+    <script>
+    (function(){
+        const openBtn = document.getElementById('open-media-modal');
+        const modal = document.getElementById('mediaModal');
+        const closeBtn = document.getElementById('mediaModalClose');
+        const cancelBtn = document.getElementById('mediaCancel');
+        const backdrop = document.getElementById('mediaModalBackdrop');
+        const fileInput = document.getElementById('post_image_input');
+        const preview = document.getElementById('mediaPreview');
+
+        function showModal(){
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden','false');
+            // focus first input
+            const title = document.getElementById('post_title_input');
+            if(title) title.focus();
+        }
+
+        function hideModal(){
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden','true');
+            // clear preview and inputs
+            if(fileInput) fileInput.value = '';
+            if(preview) { preview.innerHTML = ''; preview.style.display = 'none'; }
+            const title = document.getElementById('post_title_input');
+            if(title) title.value = '';
+        }
+
+        if(openBtn) openBtn.addEventListener('click', showModal);
+        if(openBtn) openBtn.addEventListener('keypress', function(e){ if(e.key === 'Enter') showModal(); });
+        if(closeBtn) closeBtn.addEventListener('click', hideModal);
+        if(cancelBtn) cancelBtn.addEventListener('click', hideModal);
+        if(backdrop) backdrop.addEventListener('click', hideModal);
+
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideModal(); });
+
+        if(fileInput){
+            fileInput.addEventListener('change', function(e){
+                const f = this.files && this.files[0];
+                if(!f) { preview.innerHTML = ''; preview.style.display = 'none'; return; }
+                const url = URL.createObjectURL(f);
+                preview.style.display = 'block';
+                // If image show img, if video show video element
+                if(f.type.startsWith('image/')){
+                    preview.innerHTML = '<img src="'+url+'" style="max-width:100%; border-radius:6px;">';
+                } else if(f.type.startsWith('video/')){
+                    preview.innerHTML = '<video src="'+url+'" controls style="max-width:100%; border-radius:6px;"></video>';
+                } else {
+                    preview.innerHTML = '<div style="padding:8px;">Selected file: '+f.name+'</div>';
+                }
+            });
+        }
+    })();
+
+    // Toggle comment form visibility on comment icon click
+(function(){
+    const commentBtns = document.querySelectorAll('.comment-toggle-btn');
+    commentBtns.forEach(btn => {
+        btn.addEventListener('click', function(){
+            const postId = this.getAttribute('data-post-id');
+            const form = document.getElementById('comment-form-' + postId);
+            // find the corresponding comments container (same post area)
+            const postElement = this.closest('.post');
+            const commentsContainer = postElement.querySelector('.comments-container');
+
+            if(form) {
+                const isHidden = (form.style.display === 'none' || !form.style.display);
+                // toggle both form and comments container together
+                form.style.display = isHidden ? 'block' : 'none';
+                if(commentsContainer) {
+                    commentsContainer.style.display = isHidden ? 'block' : 'none';
+                }
+                // focus input when shown
+                if(isHidden) {
+                    const input = form.querySelector('input[name="comment_text"]');
+                    if(input) input.focus();
+                }
+            }
+        });
+    });
+})();
+    </script>
+</body>
+</html>

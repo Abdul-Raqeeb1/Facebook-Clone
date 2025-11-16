@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>User Profile</title>
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/facebookhome.css' %}">
+	<link rel="stylesheet" href="{% static 'css/facebookhome-mobile.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" href="{% static 'css/userprofile.css' %}">
+    <link rel="stylesheet" href='{% static "css/hide-mobile-icons.css" %}'>
+	<style>
+	/* Simple modal styles for Edit Profile */
+	#editProfileModal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:9999}
+	#editProfileModal .modal-content{background:#fff;padding:18px;border-radius:8px;max-width:520px;width:96%;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+	#editProfileModal .modal-content h3{margin:0 0 10px}
+	#editProfileModal .form-row{margin-bottom:10px}
+	#editProfileModal label{display:block;font-size:13px;color:#333;margin-bottom:6px}
+	#editProfileModal input[type="text"], #editProfileModal input[type="file"]{width:100%;padding:8px;border:1px solid #e1e3e6;border-radius:6px}
+	#editProfileModal .modal-close{cursor:pointer}
+	</style>
+	
+</head>
+<body>
+
+	<!-- Reuse header/nav from Facebook_Home.html -->
+	<header class="header">
+		<div class="header-left">
+			<div class="logo"><i class="fab fa-facebook"></i></div>
+			<div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search Facebook"></div>
+		</div>
+		<div class="header-center">
+			<a href="{% url 'Homepage' %}" class="nav-icon"><i class="fas fa-home"></i></a>
+			<a href="#" class="nav-icon"><i class="fas fa-play"></i></a>
+			<a href="#" class="nav-icon"><i class="fas fa-store"></i></a>
+			<a href="#" class="nav-icon"><i class="fas fa-users"></i></a>
+			<a href="#" class="nav-icon"><i class="fas fa-gamepad"></i></a>
+		</div>
+		<div class="header-right">
+			<div class="action-button"><i class="fas fa-plus"></i></div>
+			<div class="action-button"><i class="fab fa-facebook-messenger"></i></div>
+			<div class="action-button"><i class="fas fa-bell"></i></div>
+			<div class="user-profile">
+			{% if user.account_extra_details.profile_pic %}
+				<img src="{{ user.account_extra_details.profile_pic.url }}" alt="Profile">
+			{% else %}
+				<img src="{% static 'image/contact1.jpeg' %}" alt="Profile">
+			{% endif %}
+			</div>
+		</div>
+	</header>
+
+	<!-- Banner: uses an online image and falls back to gradient via CSS -->
+	<div class="profile-banner" style="background-image: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
+		<div class="banner-content">
+			<h1 style="color: white; font-size: 42px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Akcrev Studio</h1>
+			<p style="color: white; font-size: 18px; margin: 8px 0 0 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+				Photographer · Brand Identity · UI/UX Design · Development
+			</p>
+		</div>
+	</div>
+
+	<!-- Profile header card (avatar, name, actions) -->
+	<div class="profile-card">
+			{% if user.account_extra_details.profile_pic %}
+				<img class="profile-avatar" src="{{ user.account_extra_details.profile_pic.url }}" alt="Profile avatar">
+			{% else %}
+				<img class="profile-avatar" src="{% static 'image/contact1.jpeg' %}" alt="Profile avatar">
+			{% endif %}
+
+		<div>
+			<div class="profile-name">{{ user.first_name }} {{ user.last_name }}</div>
+			<div class="profile-sub">4.8K friends &middot; Photographer · Brand Identity · UI/UX Design · Development</div>
+		</div>
+
+		<div class="profile-actions">
+			<button class="btn btn-primary">+ Add Story</button>
+			<button type="button" id="editProfileBtn" class="btn btn-ghost">Edit Profile</button>
+
+			<!-- Logout link -->
+			<form method="get" action="{% url 'Logout_Page' %}" style="display:inline">
+				<button type="submit" class="btn btn-ghost" style="display: flex; align-items: center; gap: 8px;">
+					<i class="fas fa-sign-out-alt"></i>
+					<span>Logout</span>
+				</button>
+			</form>
+
+			<!-- Delete account (POST) -->
+			<form method="post" action="{% url 'Delete_Account' %}" style="display:inline">
+				{% csrf_token %}
+				<button type="submit" class="btn btn-danger" style="display: flex; align-items: center; gap: 8px;" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+					<i class="fas fa-trash-alt"></i>
+					<span>Delete Account</span>
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Main profile layout: left intro, center posts, right photos -->
+	<div class="profile-layout">
+		<aside class="profile-left">
+			<div class="intro">
+				<h3>Intro</h3>
+				<p>I offer services for creating Brand Identity, Websites, and Website/App Design.</p>
+				<ul>
+					<li>Studied Information Engineering at Harvard University</li>
+					<li>Went to MTsn 1 Jakarta</li>
+					<li>From North Sumatra</li>
+				</ul>
+				<hr>
+				<h4>Photos</h4>
+				<div class="photos-grid">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p1" style="width:100%">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p2" style="width:100%">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p3" style="width:100%">
+				</div>
+			</div>
+		</aside>
+
+		<section class="profile-center">
+			<div class="intro" style="margin-bottom:12px">
+				<input type="text" placeholder="What's on your mind, Akli?" style="width:100%; padding:12px; border-radius:8px; border:1px solid #e1e3e6">
+			</div>
+
+			{% comment %} {% for post in posts %}
+			
+			<!-- Example post to match attached design -->
+			<div class="intro" style="margin-bottom:12px">
+				<div style="display:flex; gap:10px; align-items:center">
+					<img src="{% static 'image/contact1.jpeg' %}" alt="p" width="48" height="48" style="border-radius:50%">
+					<div>
+						<strong>{{ user.first_name }} {{ user.last_name }}</strong>
+						<div style="color:#90949c; font-size:13px">{{ post.post_time}}</div>
+					</div>
+				</div>
+				<p style="margin-top:12px">{{post.title_post}}</p>
+				<img src="{% static "{{ post.post_image.url}}" %}" alt="mountain" style="width:100%; border-radius:8px">
+			</div>
+		
+			
+			{% endfor %}  {% endcomment %}
+			{% for posts in user_posts %}
+			<div class="post">
+				<div class="post-header">
+					<img src="{% static "image/contact1.jpeg" %}" alt="Profile" width="40" height="40">
+					<div class="post-info">
+						<h4>{{posts.post_id.first_name}} {{posts.post_id.last_name}}</h4>
+						<span>{{posts.post_time}}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+						<p>{{ posts.title_post }}</p>
+                        {% if posts.post_image %}
+						                            
+			
+                            {% if  "mp4" in posts.post_image.url  %}
+                            <video src="{{ posts.post_image.url }}" controls style="width:100%; border-radius:8px; margin-top:8px;"></video>
+                            {% else %}
+							<img src="{{ posts.post_image.url }}" alt="Post image" style="width:100%; border-radius:8px; margin-top:8px;">
+                            {% endif %}
+                            {% endif %}
+                            {% if posts.post_image %}
+                                <div style="margin-top:6px; font-size:12px; color:#666">Views <span>{{ posts.post_views }}</span></div>
+                            {% endif %}
+                    </div>
+                    <div class="post-actions" style="width:100%; display:flex; align-items:center; justify-content:space-around;">
+						<form method="post" action="{% url 'Like_Post' %}" style="display:inline;margin-left:8px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                            <button type="submit" class="post-action" style="background:none; border:none;">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>Like ({{ posts.post_likes }})</span>
+                            </button>
+                        </form>
+                        <button type="button" class="post-action comment-toggle-btn" data-post-id="{{ post.id }}" style="background:none; border:none;">
+                            <i class="fas fa-comment"></i>
+                            <span>Comment</span>
+                        </button>
+                        <div class="post-action">
+                            <i class="fas fa-share"></i>
+                            <span>Share</span>
+                        </div>
+                    </div>
+                    <!-- Comments list -->
+					
+                    <div class="comments-container">
+                        {% for c in post.comments.all|slice:":5" %}
+                        <div class="comment">
+                            <strong style="font-size:13px">{{ c.user.first_name }} {{ c.user.last_name }}</strong>
+                            <div style="font-size:13px; color:#444">{{ c.comment_text }}</div>
+                            <div style="font-size:11px; color:#888">{{ c.created_at }}</div>
+                        </div>
+                        {% empty %}
+                        <div class="no-comments">No comments yet</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Add comment form (hidden by default, toggle on comment icon click) -->
+                    <form method="post" action="{% url 'Add_Comment' %}" class="comment-form" id="comment-form-{{ post.id }}" style="display:none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" name="comment_text" placeholder="Write a comment..." style="width:80%; padding:8px; border-radius:16px; border:1px solid var(--border-gray);">
+                            <button type="submit" class="btn btn-ghost" style="margin-left:8px;width:20%;background: blue;color: white;">Send</button>
+                        </div>
+                    </form>
+                
+                </div>
+				{% endfor %}
+
+		
+			</section>
+
+
+		<aside class="profile-right">
+			<div class="intro">
+				<h4>About</h4>
+				<p>Photographer · Brand Identity · UI/UX Design · Development</p>
+			</div>
+			<div class="intro" style="margin-top:12px">
+				<h4>Photos</h4>
+				<div class="photos-grid">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p1" style="width:100%">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p2" style="width:100%">
+					<img src="{% static 'image/post-1.jpeg' %}" alt="p3" style="width:100%">
+				</div>
+			</div>
+		</aside>
+	</div>
+
+	<!-- load font-awesome icons used in header -->
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal">
+	<div class="modal-content">
+		<span class="modal-close" title="Close">&times;</span>
+		<h3>Edit Profile</h3>
+		<form method="post" action="{% url 'Edit_Profile' %}" enctype="multipart/form-data" id="editProfileForm">
+			{% csrf_token %}
+			<div class="form-row">
+				<label for="firstName">First name</label>
+				<input type="text" id="firstName" name="first_name" value="{{ user.first_name }}" required>
+			</div>
+			<div class="form-row">
+				<label for="lastName">Last name</label>
+				<input type="text" id="lastName" name="last_name" value="{{ user.last_name }}" required>
+			</div>
+			<div class="form-row">
+				<label for="profilePicInput">Profile picture</label>
+				<input type="file" id="profilePicInput" name="profile_pic" accept="image/*">
+				<div id="profilePicPreview" style="margin-top:8px;">
+					{% if user.account_extra_details.profile_pic %}
+						<img src="{{ user.account_extra_details.profile_pic.url }}" id="profilePicImg" alt="Preview" style="max-width:120px;border-radius:50%">
+					{% else %}
+						<img src="{% static 'image/contact1.jpeg' %}" id="profilePicImg" alt="Preview" style="max-width:120px;border-radius:50%">
+					{% endif %}
+				</div>
+			</div>
+			<div style="margin-top:12px;display:flex;gap:8px;">
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button type="button" class="btn btn-ghost modal-close">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+	<script>
+	// Modal open/close and image preview
+	document.addEventListener('DOMContentLoaded', function(){
+	  const editBtn = document.getElementById('editProfileBtn');
+	  const modal = document.getElementById('editProfileModal');
+	  if(editBtn){ editBtn.addEventListener('click', ()=> modal.style.display = 'flex'); }
+	  const closeEls = modal.querySelectorAll('.modal-close');
+	  closeEls.forEach(el=> el.addEventListener('click', ()=> modal.style.display = 'none'));
+	  window.addEventListener('click', e=> { if(e.target === modal) modal.style.display = 'none'; });
+	  const input = document.getElementById('profilePicInput');
+	  const img = document.getElementById('profilePicImg');
+	  if(input && img){
+	    input.addEventListener('change', function(){
+	      const file = this.files[0];
+	      if(file){ img.src = URL.createObjectURL(file); }
+	    });
+	  }
+	});
+	</script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+</body>
+</html>

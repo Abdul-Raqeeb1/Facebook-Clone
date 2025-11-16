@@ -1,0 +1,485 @@
+/* ======================================================
+   style.css  — Facebook-inspired responsive login page
+   Files: index.html, css/style.css, js/app.js
+   - CSS variables for easy theming
+   - Responsive two-column desktop layout; stacked mobile layout
+   - Accessible focus states, smooth transitions
+  ====================================================== */
+
+/* --------------------
+   Root variables
+   -------------------- */
+:root {
+   --bg: #f0f2f5;
+   /* page background */
+   --card-bg: #ffffff;
+   --primary: #1877f2;
+   /* login button */
+   --primary-600: #165fc1;
+   --create: #42b72a;
+   /* create account */
+   --text: #1c1e21;
+   --muted: #65676b;
+   --border: #d8dbe2;
+   --radius: 10px;
+   --shadow-sm: 0 6px 18px rgba(18, 21, 26, 0.08);
+   --shadow-md: 0 20px 40px rgba(10, 10, 10, 0.12);
+   --space-xs: 8px;
+   --space-sm: 12px;
+   --space-md: 16px;
+   --space-lg: 24px;
+   --space-xl: 32px;
+   --transition: 180ms cubic-bezier(.22, .9, .32, 1);
+   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* --------------------
+/* Base reset & typography
+   -------------------- */
+*,
+*::before,
+*::after {
+   box-sizing: border-box
+}
+
+html,
+body {
+   height: 100%
+}
+
+body {
+   margin: 0;
+   font-family: var(--font-sans);
+   background: var(--bg);
+   color: var(--text);
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   line-height: 1.35;
+}
+
+
+/* visually-hidden utility for accessibility */
+.visually-hidden {
+   position: absolute !important;
+   height: 1px;
+   width: 1px;
+   overflow: hidden;
+   clip: rect(1px, 1px, 1px, 1px);
+   white-space: nowrap;
+   border: 0;
+   padding: 0;
+   margin: -1px
+}
+
+/* Smooth transitions on primary interactive controls */
+:where(button, input, select, textarea) {
+   transition: all var(--transition)
+}
+
+
+/* --------------------
+   Layout: grid for desktop
+   -------------------- */
+.layout {
+   min-height: 84vh;
+   display: grid;
+   grid-template-columns: 0.8fr 520px;
+   gap: var(--space-xl);
+   align-items: stretch;
+   justify-content: center;
+   padding: var(--space-xl)
+}
+
+/* Hero / left column */
+.hero {
+   display: flex;
+   align-items: center;
+   padding: var(--space-xl);
+   border-radius: 14px;
+   overflow: hidden
+}
+
+.hero__content {
+   max-width: 560px
+}
+
+.hero__logo {
+   display: block;
+   margin-bottom: var(--space-lg);
+   max-width: 220px
+}
+
+.hero__tag {
+   font-size: 1.75rem;
+   line-height: 1.15;
+   color: var(--text);
+   font-weight: 600;
+   margin: 0
+}
+
+.hero {
+   color: #000
+}
+
+/* Auth / right column */
+.auth {
+   display: flex;
+   align-items: center;
+   justify-content: center
+}
+
+.auth__card {
+   width: 100%;
+   max-width: 380px;
+   background: var(--card-bg);
+   padding: 28px;
+   border-radius: 12px;
+   box-shadow: var(--shadow-sm);
+   display: flex;
+   flex-direction: column;
+   gap: 12px
+}
+
+.auth__logo {
+   display: flex;
+   justify-content: center;
+   margin-bottom: 6px
+}
+
+.auth__logo img {
+   display: block;
+   max-width: 200px;
+   height: auto
+}
+
+.auth__small {
+   text-align: center;
+   color: var(--muted);
+   font-size: 0.9rem;
+   margin: 6px 0 0
+}
+
+
+/* --------------------
+   Form controls
+   -------------------- */
+.login-form {
+   display: flex;
+   flex-direction: column;
+   gap: 12px
+}
+
+.form-group {
+   display: flex;
+   flex-direction: column;
+   gap: 6px
+}
+
+.form-group label {
+   font-size: 0.95rem;
+   color: var(--text)
+}
+
+.form-group input {
+   padding: 12px 14px;
+   border-radius: 8px;
+   border: 1px solid var(--border);
+   font-size: 0.95rem;
+   background: linear-gradient(180deg, #fff, #fbfbfb);
+   color: var(--text)
+}
+
+.form-group input::placeholder {
+   color: var(--muted)
+}
+
+/* Focus visible for accessibility */
+.form-group input:focus {
+   outline: none;
+   box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.08);
+   border-color: var(--primary)
+}
+
+.form-actions {
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   width: 100%
+}
+
+.btn {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   padding: 12px 14px;
+   border-radius: 8px;
+   border: 0;
+   cursor: pointer;
+   font-weight: 600;
+   width: 100%
+}
+
+.btn:focus {
+   outline: none;
+   box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.12)
+}
+
+.btn-primary {
+   background: var(--primary);
+   color: #fff;
+   box-shadow: 0 8px 18px rgba(24, 119, 242, 0.14)
+}
+
+.btn-primary:hover {
+   background: var(--primary-600);
+   transform: translateY(-1px)
+}
+
+.btn-create {
+   background: var(--create);
+   color: #fff;
+   text-decoration: none;
+}
+
+.btn-create:hover {
+   filter: brightness(0.95);
+   transform: translateY(-1px)
+}
+
+.btn[disabled],
+.btn[aria-disabled='true'] {
+   opacity: 0.6;
+   cursor: not-allowed;
+   transform: none;
+   box-shadow: none
+}
+
+.forgot {
+   display: block;
+   color: var(--muted);
+   font-size: 0.9rem;
+   text-decoration: none;
+   margin-top: 6px
+}
+
+.forgot:hover {
+   color: var(--text)
+}
+
+/* Divider */
+.divider {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+   margin: 10px 0
+}
+
+.divider .line {
+   flex: 1;
+   height: 1px;
+   background: var(--border)
+}
+
+.divider .or {
+   font-size: 0.9rem;
+   color: var(--muted);
+   padding: 0 8px
+}
+
+
+/* --------------------
+   Modal
+   -------------------- */
+.modal {
+   position: fixed;
+   inset: 0;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   pointer-events: none;
+   opacity: 0;
+   visibility: hidden
+}
+
+.modal[aria-hidden='false'] {
+   pointer-events: auto;
+   opacity: 1;
+   visibility: visible
+}
+
+.modal__overlay {
+   position: fixed;
+   inset: 0;
+   background: rgba(0, 0, 0, 0.48);
+   backdrop-filter: blur(2px)
+}
+
+.modal__panel {
+   position: relative;
+   z-index: 10;
+   background: var(--card-bg);
+   border-radius: 12px;
+   max-width: 640px;
+   width: 92%;
+   padding: 20px;
+   box-shadow: var(--shadow-md);
+   transform: translateY(12px) scale(0.98);
+   transition: transform 240ms var(--transition)
+}
+
+.modal[aria-hidden='false'] .modal__panel {
+   transform: translateY(0) scale(1)
+}
+
+.modal__header {
+   display: flex;
+   align-items: center;
+   justify-content: space-between
+}
+
+.modal__header h2 {
+   margin: 0;
+   font-size: 1.25rem
+}
+
+.modal__close {
+   background: transparent;
+   border: 0;
+   font-size: 1.125rem;
+   cursor: pointer;
+   padding: 6px;
+   border-radius: 6px
+}
+
+.modal__close:hover {
+   background: rgba(0, 0, 0, 0.04)
+}
+
+.modal__body form {
+   display: flex;
+   flex-direction: column;
+   gap: 12px
+}
+
+.form-row {
+   display: flex;
+   gap: 12px
+}
+
+.form-half {
+   flex: 1
+}
+
+
+/* --------------------
+   Footer
+   -------------------- */
+.site-footer {
+   background: rgba(0, 0, 0, 0.03);
+   padding: 14px 24px;
+   text-align: center;
+   margin-top: 20px
+}
+
+.site-footer a {
+   color: var(--muted);
+   text-decoration: none;
+   margin: 0 8px;
+   font-size: 0.9rem
+}
+
+
+.error-message {
+   color: #ff3b30;
+   font-size: 13px;
+   margin-top: 4px;
+   display: none;
+}
+
+.form-group.has-error input {
+   border-color: #ff3b30;
+}
+
+/* --------------------
+   Responsive rules
+   -------------------- */
+/* Tablet: center content and reduce hero prominence */
+@media (max-width:1023px) {
+   .layout {
+      grid-template-columns: 1fr 420px;
+      padding: var(--space-lg)
+   }
+
+   .hero__tag {
+      font-size: 1.5rem
+   }
+}
+
+/* Narrow tablets */
+@media (max-width:900px) {
+   .layout {
+      grid-template-columns: 1fr 1fr
+   }
+
+   .auth__card {
+      max-width: 420px
+   }
+}
+
+/* Mobile: single column, hide left hero */
+@media (max-width:599px) {
+   .layout {
+      display: block;
+      padding: var(--space-md)
+   }
+
+   .hero {
+      display: none
+   }
+
+   .auth {
+      padding: var(--space-md)
+   }
+
+   .auth__card {
+      width: 100%;
+      padding: 18px;
+      border-radius: 10px
+   }
+
+   .hero__tag {
+      font-size: 1.15rem
+   }
+}
+
+/* Typography scaling */
+@media (min-width:1200px) {
+   html {
+      font-size: 16px
+   }
+}
+
+@media (max-width:1199px) {
+   html {
+      font-size: 15px
+   }
+}
+
+@media (max-width:599px) {
+   html {
+      font-size: 14px
+   }
+}
+
+/* small interactive polish */
+button,
+a {
+   transition: transform 160ms var(--transition), filter 160ms var(--transition)
+}
+
+button:hover,
+a:hover {
+   transform: translateY(-1px)
+}
+
+/* End of file */

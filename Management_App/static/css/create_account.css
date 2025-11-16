@@ -1,0 +1,300 @@
+/*
+  create_account.css
+  Facebook-style "Create a new account" popup (visual clone)
+  - Pure CSS only
+  - Responsive, modern, accessible
+*/
+
+/* -----------------------------
+   Root variables
+   ----------------------------- */
+:root{
+  --page-bg: #f0f2f5;
+  --card-bg: #ffffff;
+  --text: #1c1e21;
+  --muted: #65676b;
+  --border: #ccd0d5;
+  --focus: #1877f2; /* Facebook blue */
+  --action: #42b72a; /* Sign up green */
+  --radius-card: 8px;
+  --radius-input: 6px;
+  --shadow-card: 0 8px 24px rgba(15,20,30,0.08);
+  --card-width: 430px;
+  --gap-sm: 8px;
+  --gap-md: 16px;
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --transition-fast: 180ms ease;
+}
+
+/* -----------------------------
+   Base / page layout
+   ----------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-stack);
+  background: var(--page-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Center the popup in the page */
+.page-wrap,
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;  /* vertical center */
+  justify-content: center; /* horizontal center */
+  padding: 24px;
+}
+
+/* -----------------------------
+   Popup card
+   ----------------------------- */
+.signup-card {
+  width: 100%;
+  max-width: var(--card-width);
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  position: relative;
+}
+
+/* close button (top-right) */
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.04);
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.close-btn:hover { background: rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+/* -----------------------------
+   Logo and header
+   ----------------------------- */
+.logo { text-align: center; }
+.fb-logo {
+  color: var(--focus);
+  font-weight: 800;
+  font-size: 55px;            /* large like Facebook's logo text */
+  line-height: 1;
+  text-transform: lowercase;
+  letter-spacing: -2px;
+  margin: 0;
+}
+
+.signup-heading { text-align: center; }
+.signup-heading h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.signup-heading .subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* -----------------------------
+   Form: general fields
+   ----------------------------- */
+.signup-form { display: flex; flex-direction: column; gap: 14px; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 13px; color: var(--muted); }
+
+/* Input and select basic style */
+input[type="text"],
+input[type="password"],
+select {
+  width: 100%;
+  height: 40px; /* visually similar to FB */
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  background: #fff;
+  font-size: 14px;
+  color: var(--text);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+input::placeholder { color:#b0b3b8; }
+
+/* Focus */
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px rgba(24,119,242,0.06);
+}
+
+/* -----------------------------
+   Name row (two columns)
+   ----------------------------- */
+.name-row { display: flex; gap: var(--gap-sm); }
+.name-row .half { flex: 1; }
+
+/* On small screens, stack them */
+@media (max-width: 600px) {
+  .name-row { flex-direction: column; }
+}
+
+/* -----------------------------
+   Date of birth (three selects inline)
+   ----------------------------- */
+.dob-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.dob-row { display: flex; gap: 8px; align-items: center; }
+.dob-row select { flex: 1; height: 40px; }
+
+/* stack on mobile */
+@media (max-width: 600px) {
+  .dob-row { flex-direction: column; }
+}
+
+/* -----------------------------
+   Gender options (3 boxes)
+   ----------------------------- */
+/* Inputs placed before labels so we can use input:checked + label */
+.gender-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* hide radio inputs (we style the labels) */
+.gender-row .gender-input {
+  position: absolute !important;
+  clip: rect(1px,1px,1px,1px);
+  width:1px;height:1px;margin:-1px;padding:0;border:0;
+}
+
+/* label after input (input:checked + label) */
+.gender-row .gender-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  user-select: none;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* When its preceding input is checked, style the label */
+.gender-row input[type="radio"]:checked + label.gender-option {
+  border-color: var(--focus);
+  box-shadow: 0 6px 14px rgba(24,119,242,0.06);
+  transform: translateY(-1px);
+}
+
+/* Hover effect for gender labels */
+.gender-row label.gender-option:hover {
+  border-color: var(--focus);
+  box-shadow: 0 6px 14px rgba(24,119,242,0.04);
+}
+
+/* Stack gender on mobile */
+@media (max-width: 600px) {
+  .gender-row { flex-direction: column; }
+}
+
+/* -----------------------------
+   Privacy & terms text
+   ----------------------------- */
+.privacy-note, .terms-note {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.terms-note a, .privacy-note a, .inline-link { color: var(--focus); text-decoration: none; }
+.terms-note a:hover, .privacy-note a:hover { text-decoration: underline; }
+
+/* -----------------------------
+   Sign Up button + login link
+   ----------------------------- */
+.signup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Full-width button visually; card padding constrains width */
+.btn-signup {
+  width: 100%;
+  display: inline-block;
+  background: var(--action);
+  color: #fff;
+  border: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: filter var(--transition-fast), transform var(--transition-fast);
+}
+.btn-signup:hover { filter: brightness(0.96); transform: translateY(-1px); }
+
+.already-link {
+  color: var(--focus);
+  font-weight: 600;
+  text-decoration: none;
+}
+.already-link:hover { text-decoration: underline; }
+
+/* -----------------------------
+   Footer languages
+   ----------------------------- */
+.signup-footer {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.signup-footer a { color: var(--muted); text-decoration: none; padding: 4px; }
+.signup-footer a:hover { color: var(--text); text-decoration: underline; }
+
+/* -----------------------------
+   Responsive small screen tweaks
+   ----------------------------- */
+@media (max-width: 600px) {
+  .signup-card { padding: 16px; width: 100%; max-width: 420px; }
+  .fb-logo { font-size: 40px; }
+  .signup-form { gap: 12px; }
+  input[type="text"], input[type="password"], select { height: 40px; padding: 10px; }
+  .btn-signup { padding: 12px; }
+}
+
+/* small utility */
+.text-center { text-align:center; }

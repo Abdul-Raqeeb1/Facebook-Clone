@@ -1,0 +1,83 @@
+/* Small profile-specific tweaks to match the attached design */
+		.profile-banner {
+			height: 350px;
+			background: linear-gradient(135deg,#0b66d0 0%,#57c7ff 100%);
+			border-radius: 8px;
+			/*position: relative;*/
+		}
+		.profile-card {
+			max-width: 1100px;
+			margin: -70px auto 24px;
+			display: flex;
+			align-items: flex-end;
+			gap: 20px;
+			padding: 0 16px;
+		}
+		.profile-avatar {
+			width: 140px;
+			height: 140px;
+			border-radius: 50%;
+			border: 6px solid #fff;
+			box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+			object-fit: cover;
+			background: #ddd;
+		}
+		.profile-actions {
+			margin-left: auto;
+			display:flex;
+			gap:10px;
+			align-items:center;
+		}
+		/* Reusable button styles (align with global style.css) */
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 8px 12px;
+			border-radius: 6px;
+			border: 0;
+			font-weight: 600;
+			cursor: pointer;
+		}
+
+		.btn[disabled], .btn[aria-disabled='true'] { opacity: 0.6; cursor: not-allowed }
+
+		.btn-primary { background: #1b74e4; color: white; box-shadow: 0 6px 14px rgba(27,116,228,0.14) }
+
+		.btn-danger { background: #ff4d4f; color: white }
+
+		.btn-ghost {
+			background: #e4e6eb; color: #050505; border: 1px solid #ccd0d5
+		}
+		.profile-name { font-size:22px; font-weight:700; }
+		.profile-sub { color:#606770; margin-top:6px }
+		/* page columns */
+		.profile-layout { max-width:1100px; margin: 12px auto; display:flex; gap:20px; padding:0 16px }
+		.profile-left { width:260px }
+		.profile-center { flex:1 }
+		.profile-right { width:300px }
+		.intro { background:#fff; padding:12px; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.04) }
+		.photos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px }
+
+	/* Banner content styling */
+	.profile-banner .banner-content h1 { font-size: 42px; margin: 0; color: #fff }
+	.profile-banner .banner-content p { color: rgba(255,255,255,0.95); margin-top:8px }
+
+/* Responsive: stack columns on small screens */
+@media (max-width: 900px) {
+	.profile-layout { display: block; padding: 0 12px }
+	.profile-left, .profile-right { width: 100%; margin-bottom: 12px }
+	.profile-card { flex-direction: column; align-items: center; gap: 12px; margin: -60px auto 16px }
+	.profile-avatar { width: 120px; height: 120px }
+	.profile-name { font-size: 20px }
+	.profile-banner .banner-content h1 { font-size: 32px }
+	.profile-banner .banner-content p { font-size: 14px }
+}
+
+@media (max-width: 480px) {
+	.profile-banner { height: 290px }
+	.profile-avatar { width: 96px; height: 96px }
+	.profile-card { margin: -48px 8px 12px }
+	.profile-banner .banner-content h1 { font-size: 22px }
+	.profile-banner .banner-content p { font-size: 12px }
+}

@@ -1,0 +1,17 @@
+/* Hide Store and Gamepad icons on mobile */
+
+/* Hide on tablet and mobile (768px and below) */
+@media (max-width: 768px) {
+    .header-center a:nth-child(3),  /* store icon */
+    .header-center a:nth-child(5) {  /* gamepad icon */
+        display: none !important;
+    }
+}
+
+/* Keep visible on desktop (769px and above) */
+@media (min-width: 769px) {
+    .header-center a:nth-child(3),
+    .header-center a:nth-child(5) {
+        display: flex !important;
+    }
+}
