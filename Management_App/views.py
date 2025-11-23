@@ -320,4 +320,5 @@ def Friends_Page(request):
     return render(request, 'Friends_Section.html')
 
 def Requests_Page(request):
-    return render(request, 'Request_Section.html')
+    User_get = User.objects.all()   
+    return render(request, 'Request_Section.html', {'User_get': User_get})

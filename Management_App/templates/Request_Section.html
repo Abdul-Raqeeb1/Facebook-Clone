@@ -11,6 +11,38 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
  
+    <style>
+      /* Friend Requests page styles (desktop first) - full width layout */
+      .requests-container{width:100%;max-width:none;margin:12px 0;display:grid;grid-template-columns:260px 1fr;gap:16px;padding:12px 24px;box-sizing:border-box}
+      .left-nav{background:#fff;border-radius:8px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+      .left-nav h3{margin:6px 0 12px;font-size:18px}
+      .left-nav .nav-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#050505;cursor:pointer}
+      .left-nav .nav-item i{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#F0F2F5;color:#1877F2}
+      .left-nav .nav-item.active{background:#F0F2F5}
+
+      .requests-main{background:transparent}
+      .requests-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+      .requests-header h2{margin:0;font-size:20px}
+      .see-all{color:#4b4f56;font-size:14px}
+
+      /* Grid of cards */
+      .requests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+      .req-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(2,6,23,0.04);display:flex;flex-direction:column}
+      .req-image{width:100%;height:160px;object-fit:cover;display:block}
+      .req-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+      .req-name{font-size:15px;font-weight:700;color:#050505}
+      .req-mutual{font-size:13px;color:#6b7280}
+      .req-actions{display:flex;gap:8px;margin-top:6px}
+      .btn-confirm{background:#1877F2;color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;flex:1;font-weight:600}
+      .btn-delete{background:#f2f3f5;color:#111;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;flex:1}
+
+      /* small screens: stack single column */
+      @media (max-width:900px){
+        .requests-container{grid-template-columns:1fr;padding:12px}
+        .left-nav{order:2}
+        .requests-main{order:1}
+      }
+    </style>
   </head>
   <body>
     <!-- Header -->
@@ -67,6 +99,118 @@
     <br />
     <br />
 
+    <div class="requests-container">
+      <!-- Left nav (Friends menu) -->
+      <nav class="left-nav" aria-label="Friends navigation">
+        <h3>Friends</h3>
+        <div class="nav-item active">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-user-plus"></i>
+          <span>Friend Requests</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-user-friends"></i>
+          <span>Suggestions</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>All friends</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-birthday-cake"></i>
+          <span>Birthdays</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-list"></i>
+          <span>Custom Lists</span>
+        </div>
+      </nav>
+
+      <!-- Main requests area -->
+      <main class="requests-main">
+        <div class="requests-header">
+          <h2>Friend Requests</h2>
+          <a class="see-all" href="#">See All</a>
+        </div>
+
+        <div id="requestsGrid" class="requests-grid" aria-live="polite"></div>
+      </main>
+    </div>
+
+    <script>
+      // Sample friend requests data (use your real data in Django later)
+      const requests = [
+        {id:1, name:'Moni A. Castro', mutual:26, img:'{% static "image/contact1.jpeg" %}'},
+        {id:2, name:'Carley Mckenzie', mutual:166, img:'{% static "image/contact2.jpeg" %}'},
+        {id:3, name:'Mono Bay', mutual:3, img:'{% static "image/contact3.jpeg" %}'},
+        {id:4, name:'Anthony Bomber', mutual:3, img:'{% static "image/contact4.jpeg" %}'},
+        {id:5, name:'Sarah Lee', mutual:12, img:'{% static "image/contact1.jpeg" %}'},
+        {id:6, name:'Peter Kim', mutual:4, img:'{% static "image/contact2.jpeg" %}'}
+      ];
+
+      const grid = document.getElementById('requestsGrid');
+
+      function renderRequests(){
+        grid.innerHTML = '';
+        requests.forEach(r=>{
+          const card = document.createElement('div');
+          card.className = 'req-card';
+
+          const img = document.createElement('img');
+          img.className = 'req-image';
+          img.src = r.img;
+          img.alt = r.name;
+          card.appendChild(img);
+
+          const body = document.createElement('div');
+          body.className = 'req-body';
+
+          const name = document.createElement('div');
+          name.className = 'req-name';
+          name.textContent = r.name;
+          body.appendChild(name);
+
+          const mutual = document.createElement('div');
+          mutual.className = 'req-mutual';
+          mutual.textContent = `${r.mutual} mutual friends`;
+          body.appendChild(mutual);
+
+          const actions = document.createElement('div');
+          actions.className = 'req-actions';
+
+          const confirm = document.createElement('button');
+          confirm.className = 'btn-confirm';
+          confirm.textContent = 'Confirm';
+          confirm.addEventListener('click', ()=>{
+            confirm.textContent = 'Friends';
+            confirm.disabled = true;
+            confirm.style.opacity = '0.85';
+          });
+
+          const del = document.createElement('button');
+          del.className = 'btn-delete';
+          del.textContent = 'Delete';
+          del.addEventListener('click', ()=>{
+            // remove from array and re-render
+            const idx = requests.findIndex(x=>x.id===r.id);
+            if(idx>-1) requests.splice(idx,1);
+            renderRequests();
+          });
+
+          actions.appendChild(confirm);
+          actions.appendChild(del);
+          body.appendChild(actions);
+
+          card.appendChild(body);
+          grid.appendChild(card);
+        });
+      }
+
+      renderRequests();
+    </script>
 
   </body>
 </html>

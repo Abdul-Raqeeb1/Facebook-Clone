@@ -30,17 +30,16 @@
         height: 20px;
       }
 
-      /* Two-panel layout: fixed contacts column + flexible chat column. Centered and responsive on desktop. */
+      /* Two-panel layout: fixed contacts column + flexible chat column. Full-width on desktop. */
       .msger-wrap {
-        width: calc(100% - 36px);
-        max-width: 1200px;
-        margin: 18px auto;
+        width: 100%;
+        max-width: none;
+        margin: 12px 0;
         display: grid;
-        grid-template-columns: 360px 1fr;
-        gap: 20px;
-        padding: 16px;
+        grid-template-columns: 320px 1fr;
+        gap: 12px;
+        padding: 12px;
         box-sizing: border-box;
-        box-shadow: 0 6px 18px rgba(2,6,23,0.06);
       }
 
       .contacts {
@@ -48,6 +47,7 @@
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
         overflow: hidden;
+        height: calc(100vh - 140px);
       }
       .contacts-header {
         padding: 18px 18px 8px 18px;
@@ -59,7 +59,7 @@
       }
 
       .contacts-list {
-        max-height: 520px;
+        height: calc(100% - 72px);
         overflow: auto;
       }
       .contact-item {
@@ -106,7 +106,7 @@
         border-radius: 12px;
         display: flex;
         flex-direction: column;
-        height: 520px;
+        height: calc(100vh - 140px);
         box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
         overflow: hidden;
       }
