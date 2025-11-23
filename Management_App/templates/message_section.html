@@ -1,0 +1,478 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Messages</title>
+    <link rel="stylesheet" href="{% static 'css/facebookhome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
+    <style>
+      /* Messenger layout styles */
+      :root {
+        --bg: #f1f5f7;
+        --card: #ffffff;
+        --muted: #6b7280;
+        --accent: #0b84ff;
+      }
+
+      body {
+        background: var(--bg);
+        font-family: Inter, system-ui, Arial, sans-serif;
+        color: #0b1220;
+      }
+
+      .spacer {
+        height: 20px;
+      }
+
+      /* Two-panel layout: fixed contacts column + flexible chat column. Centered and responsive on desktop. */
+      .msger-wrap {
+        width: calc(100% - 36px);
+        max-width: 1200px;
+        margin: 18px auto;
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 20px;
+        padding: 16px;
+        box-sizing: border-box;
+        box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+      }
+
+      .contacts {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
+        overflow: hidden;
+      }
+      .contacts-header {
+        padding: 18px 18px 8px 18px;
+        border-bottom: 1px solid #eef2f6;
+      }
+      .contacts-header h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .contacts-list {
+        max-height: 520px;
+        overflow: auto;
+      }
+      .contact-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 16px;
+        align-items: center;
+        cursor: pointer;
+        border-bottom: 1px solid #f2f4f6;
+      }
+      .contact-item.active {
+        background: linear-gradient(90deg, #f6fbff, #ffffff);
+      }
+      .contact-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+      .contact-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .contact-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #081226;
+      }
+      .contact-snippet {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .contact-time {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .chat-panel {
+        background: var(--card);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        height: 520px;
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
+        overflow: hidden;
+      }
+      .chat-header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid #eef2f6;
+      }
+      .back-btn{
+        display:none;
+        background:transparent;
+        border:0;
+        padding:6px;
+        margin-right:4px;
+        font-size:16px;
+        color:var(--muted);
+        cursor:pointer;
+      }
+      .chat-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .chat-name {
+        font-weight: 700;
+      }
+      .chat-status {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 18px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: linear-gradient(#fff, #fff);
+        min-height: 320px;
+      }
+      .msg-row {
+        display: flex;
+        align-items: flex-end;
+      }
+      .msg-left {
+        justify-content: flex-start;
+      }
+      .msg-right {
+        justify-content: flex-end;
+      }
+      .bubble {
+        max-width: 72%;
+        padding: 10px 14px;
+        border-radius: 18px;
+        background: #f2f4f6;
+        color: #081226;
+        font-size: 14px;
+      }
+      .bubble.me {
+        background: var(--accent);
+        color: #fff;
+      }
+      .msg-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      .chat-composer {
+        display: flex;
+        gap: 10px;
+        padding: 12px;
+        border-top: 1px solid #eef2f6;
+        align-items: center;
+      }
+      .composer-input {
+        flex: 1;
+        border-radius: 22px;
+        padding: 10px 14px;
+        border: 1px solid #e6edf3;
+        outline: none;
+      }
+      .send-btn {
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        padding: 8px 14px;
+        border-radius: 18px;
+        cursor: pointer;
+      }
+
+      /* Small screen: stack and add toggle behavior */
+      @media (max-width: 760px) {
+        .msger-wrap {
+          grid-template-columns: 1fr;
+          max-width: 100%;
+          padding: 8px;
+        }
+        .contacts {
+          order: 1;
+        }
+        .chat-panel {
+          order: 2;
+        }
+        .msger-wrap.show-chat .contacts {
+          display: none;
+        }
+        .msger-wrap.show-contacts .chat-panel {
+          display: none;
+        }
+        .back-btn{ display:inline-flex; align-items:center; justify-content:center }
+        .chat-panel {
+          height: calc(100vh - 170px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <!-- Left section -->
+      <div class="header-left">
+        <div class="logo">
+          <i class="fab fa-facebook"></i>
+        </div>
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search Facebook" />
+        </div>
+      </div>
+
+      <!-- Center navigation -->
+      <div class="header-center">
+        <a href="{% url 'Homepage' %}" class="nav-icon active">
+          <i class="fas fa-home"></i>
+        </a>
+        <a href="video_page" class="nav-icon">
+          <i class="fas fa-play"></i>
+        </a>
+        <a href="market_page" class="nav-icon">
+          <i class="fas fa-store"></i>
+        </a>
+        <a href="friends_page" class="nav-icon">
+          <i class="fas fa-users"></i>
+        </a>
+        <a href="#" class="nav-icon">
+          <i class="fas fa-gamepad"></i>
+        </a>
+      </div>
+
+      <!-- Right section -->
+      <div class="header-right">
+        <div class="action-button">
+          <i class="fas fa-plus"></i>
+        </div>
+        <div class="action-button">
+          <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
+        </div>
+        <div class="action-button">
+          <a href="requests_page"><i class="fas fa-bell"></i></a>
+        </div>
+        <div class="user-profile">
+          <a href="{% url 'User_Profile' %}"
+            ><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a
+          >
+        </div>
+      </div>
+    </header>
+    <br />
+    <br />
+    <br />
+
+    <div class="chat-container">
+      <div class="msger-wrap" id="msgerWrap">
+        <div class="contacts">
+          <div class="contacts-header"><h3>Messages</h3></div>
+          <div id="contactsList" class="contacts-list"></div>
+        </div>
+        <div class="chat-panel">
+          <div class="chat-header">
+            <button id="backBtn" class="back-btn" aria-label="Back to contacts"><i class="fas fa-arrow-left"></i></button>
+            <img
+              id="chatAvatar"
+              class="chat-avatar"
+              src="{% static 'image/contact1.jpeg' %}"
+              alt="avatar"
+            />
+            <div>
+              <div id="chatName" class="chat-name">Select a conversation</div>
+              <div class="chat-status">Active now</div>
+            </div>
+          </div>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-composer">
+            <input
+              id="composerInput"
+              class="composer-input"
+              placeholder="Type a message..."
+            />
+            <button id="sendBtn" class="send-btn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  // Minimal data for demonstration - replace with Django data if needed
+  const conversations = [
+    {
+      id: 1,
+      name: "Seth Foster",
+      avatar: '{% static "image/contact1.jpeg" %}',
+      last: "That's dumb lol",
+      time: "10:23am",
+      messages: [
+        { from: "them", text: "That's dumb lol", time: "10:23am" },
+        { from: "me", text: "you're dumb", time: "10:24am" },
+        { from: "me", text: "Am not", time: "10:25am" },
+      ],
+    },
+    {
+      id: 2,
+      name: "Mel Porter",
+      avatar: '{% static "image/contact2.jpeg" %}',
+      last: "Messengerfordesktop.com",
+      time: "10:20am",
+      messages: [
+        { from: "them", text: "Messenger for Desktop", time: "10:20am" },
+      ],
+    },
+    {
+      id: 3,
+      name: "Nova Alam",
+      avatar: '{% static "image/contact3.jpeg" %}',
+      last: "You: AND THEN",
+      time: "10:17am",
+      messages: [{ from: "them", text: "Yes they do", time: "10:17am" }],
+    },
+  ];
+
+  const msgerWrap = document.getElementById("msgerWrap");
+  const contactsList = document.getElementById("contactsList");
+  const chatName = document.getElementById("chatName");
+  const chatAvatar = document.getElementById("chatAvatar");
+  const backBtn = document.getElementById('backBtn');
+  const chatMessages = document.getElementById("chatMessages");
+  const composerInput = document.getElementById("composerInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  let activeConv = null;
+
+  function renderContacts() {
+    contactsList.innerHTML = "";
+    conversations.forEach((conv) => {
+      const el = document.createElement("div");
+      el.className = "contact-item";
+      el.dataset.id = conv.id;
+      el.innerHTML = `
+                <img class="contact-avatar" src="${conv.avatar}">
+                <div class="contact-info">
+                    <div class="contact-name">${conv.name}</div>
+                    <div class="contact-snippet">${conv.last} · ${conv.time}</div>
+                </div>`;
+      el.addEventListener("click", () => openConversation(conv.id, el));
+      contactsList.appendChild(el);
+    });
+  }
+
+  function openConversation(id, el) {
+    activeConv = conversations.find((c) => c.id == id);
+    // mark active
+    Array.from(document.querySelectorAll(".contact-item")).forEach((i) =>
+      i.classList.remove("active")
+    );
+    if (el) el.classList.add("active");
+    chatName.textContent = activeConv.name;
+    chatAvatar.src = activeConv.avatar;
+    chatMessages.innerHTML = "";
+    activeConv.messages.forEach((m) => appendMessage(m.from, m.text, m.time));
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // On small screens, hide contacts to show chat
+    if (window.innerWidth <= 760 && msgerWrap) {
+      msgerWrap.classList.remove('show-contacts');
+      msgerWrap.classList.add("show-chat");
+    }
+  }
+
+  function appendMessage(from, text, time) {
+    const row = document.createElement("div");
+    row.className = "msg-row " + (from === "me" ? "msg-right" : "msg-left");
+    const bubble = document.createElement("div");
+    bubble.className = "bubble " + (from === "me" ? "me" : "");
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    const meta = document.createElement("div");
+    meta.className = "msg-meta";
+    meta.textContent = time || "";
+    const container = document.createElement("div");
+    container.appendChild(row);
+    container.appendChild(meta);
+    chatMessages.appendChild(container);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  sendBtn.addEventListener("click", () => {
+    const text = composerInput.value.trim();
+    if (!text || !activeConv) return;
+    const now = new Date();
+    const time =
+      now.getHours() +
+      ":" +
+      (now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes());
+    activeConv.messages.push({ from: "me", text, time });
+    appendMessage("me", text, time);
+    composerInput.value = "";
+  });
+
+  composerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendBtn.click();
+    }
+  });
+
+  // Initialize
+  renderContacts();
+  // open first conversation by default
+  setTimeout(() => {
+    const first = document.querySelector(".contact-item");
+    if (first) first.click();
+  }, 50);
+
+  // Allow tapping the avatar to return to contacts on small screens
+  document.addEventListener("click", (e) => {
+    if (
+      e.target &&
+      e.target.id === "chatAvatar" &&
+      window.innerWidth <= 760 &&
+      msgerWrap
+    ) {
+      msgerWrap.classList.remove("show-chat");
+      msgerWrap.classList.add('show-contacts');
+    }
+  });
+
+  // Back button to return to contacts on mobile
+  if(backBtn){
+    backBtn.addEventListener('click', ()=>{
+      if(window.innerWidth <= 760 && msgerWrap){
+        msgerWrap.classList.remove('show-chat');
+        msgerWrap.classList.add('show-contacts');
+      }
+    });
+  }
+
+  // On resize remove mobile classes when switching to desktop
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 760 && msgerWrap) {
+      msgerWrap.classList.remove("show-chat");
+      msgerWrap.classList.remove("show-contacts");
+    }
+  });
+</script>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Friends Sidebar</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/facebookhome.css' %}">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<style>
+		:root{
+			--fb-blue: #1877F2;
+			--hover-bg: #F0F2F5;
+			--online: #31A24C;
+			--text: #050505;
+		}
+		/* Container to demonstrate a right sidebar column */
+		body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:16px; color:var(--text)}
+		.right-sidebar{width:460px}
+		.friends-panel{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 6px 18px rgba(3,19,35,0.08);}
+		.panel-title{font-size:16px;font-weight:600;margin:6px 8px 12px}
+
+		/* Row */
+		.friend-row{display:flex;align-items:center;justify-content:space-between;height:56px;padding:8px 12px;border-radius:8px;cursor:default;transition:background .12s ease,transform .08s ease}
+		.friend-row:hover{background:var(--hover-bg);transform:translateY(-1px)}
+		.left{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+
+		/* Avatar */
+		.avatar{position:relative;width:44px;height:44px;border-radius:50%;flex:0 0 44px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:700;color:#fff}
+		.avatar img{width:44px;height:44px;object-fit:cover;border-radius:50%;display:block}
+		.avatar-initials{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+		/* Online dot */
+		.online-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--online);border:2px solid #fff;right:-4px;bottom:-4px;box-shadow:0 0 0 2px rgba(0,0,0,0.04)}
+
+		/* Name */
+		.name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+		/* Button (Facebook style) */
+		.request-btn{background:var(--fb-blue);color:#fff;border:0;padding:8px 14px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:0 4px 8px rgba(24,119,242,0.18);cursor:pointer;min-width:150px;transition:background .12s ease,transform .06s ease;}
+		.request-btn:hover{background:#166FE5}
+		.request-btn:active{transform:translateY(1px)}
+		.request-btn:focus{outline:3px solid rgba(24,119,242,0.18);outline-offset:2px}
+		.request-btn[disabled]{background:#E7F3FF;color:#6B8FCF;cursor:default;box-shadow:none;border-radius:8px}
+
+		/* Small modal */
+		.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;z-index:999}
+		.modal{background:#fff;border-radius:10px;padding:18px;width:460px;box-shadow:0 12px 36px rgba(3,19,35,0.12);}
+		.modal p{margin:0 0 16px;font-size:15px}
+		.modal .controls{display:flex;justify-content:flex-end;gap:8px}
+		.btn-cancel{background:transparent;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
+		.btn-send{background:var(--fb-blue);color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:600}
+
+		/* Responsive demo container - center the friends panel vertically */
+		.demo-wrap{display:flex;flex-direction:column;gap:16px;align-items:center}
+
+		/* small utility spacing */
+		.spacer{flex:1}
+	</style>
+</head>
+<body>
+
+    <header class="header">
+        <!-- Left section -->
+        <div class="header-left">
+            <div class="logo">
+                <i class="fab fa-facebook"></i>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Facebook">
+            </div>
+        </div>
+
+        <!-- Center navigation -->
+        <div class="header-center">
+            <a href="{% url 'Homepage' %}" class="nav-icon ">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="video_page" class="nav-icon">
+                <i class="fas fa-play"></i>
+            </a>
+            <a href="market_page" class="nav-icon">
+                <i class="fas fa-store"></i>
+            </a>
+            <a href="friends_page" class="nav-icon active">
+                <i class="fas fa-users"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-gamepad"></i>
+            </a>
+        </div>
+
+        <!-- Right section -->
+        <div class="header-right">
+            <div class="action-button">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="action-button">
+                <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
+            </div>
+            <div class="action-button">
+                <a href="requests_page"><i class="fas fa-bell"></i></a>
+            </div>
+            <div class="user-profile">
+                <a href="{% url 'User_Profile' %}"><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a>
+            </div>
+        </div>
+    </header>
+    <br><br><br>
+	<div class="demo-wrap">
+		<!-- Title for global search -->
+		<div style="width:100%;text-align:left;margin-bottom:8px;align-self:stretch;padding-left:16px;">
+			<h2 style="margin-top:0">Global Search Friends</h2>
+		</div>
+
+		<!-- Right sidebar -->
+		<aside class="right-sidebar">
+			<div class="friends-panel" role="complementary" aria-label="People you may know">
+				<div class="panel-title">People You May Know</div>
+				<div id="friendsList"></div>
+			</div>
+		</aside>
+	</div>
+
+	<!-- Modal -->
+	<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+		<div class="modal" role="document">
+			<p id="modalText">Send friend request?</p>
+			<div class="controls">
+				<button id="modalCancel" class="btn-cancel">Cancel</button>
+				<button id="modalSend" class="btn-send">Send</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Sample users array
+		const users = [
+			{id:1, name:'Aisha Khan', initials:'AK', online:true, color:'#6C5CE7', img: '{% static "image/contact1.jpeg" %}'},
+			{id:2, name:'Omar Ali', initials:'OA', online:false, color:'#00B894', img: '{% static "image/contact2.jpeg" %}'},
+			{id:3, name:'Fatima Noor', initials:'FN', online:true, color:'#0984E3', img: '{% static "image/contact3.jpeg" %}'},
+			{id:4, name:'Samuel Lee', initials:'SL', online:true, color:'#FF7675', img: '{% static "image/contact4.jpeg" %}'},
+			{id:5, name:'Priya Singh', initials:'PS', online:false, color:'#FD79A8', img: '{% static "image/contact1.jpeg" %}'}
+		];
+
+		const friendsList = document.getElementById('friendsList');
+		const modalBackdrop = document.getElementById('modalBackdrop');
+		const modalCancel = document.getElementById('modalCancel');
+		const modalSend = document.getElementById('modalSend');
+		let activeRequestButton = null;
+		let activeUserId = null;
+
+		function createAvatar(user){
+			const wrap = document.createElement('div');
+			wrap.className = 'avatar';
+
+			if(user.img){
+				const img = document.createElement('img');
+				img.src = user.img;
+				img.alt = user.name;
+				wrap.appendChild(img);
+			} else {
+				// fallback to initials
+				const inner = document.createElement('div');
+				inner.className = 'avatar-initials';
+				inner.style.background = user.color;
+				inner.textContent = user.initials;
+				wrap.appendChild(inner);
+			}
+
+			if(user.online){
+				const dot = document.createElement('span');
+				dot.className = 'online-dot';
+				wrap.appendChild(dot);
+			}
+			return wrap;
+		}
+
+		function createRow(user){
+			const row = document.createElement('div');
+			row.className = 'friend-row';
+
+			const left = document.createElement('div');
+			left.className = 'left';
+
+			const avatar = createAvatar(user);
+			left.appendChild(avatar);
+
+			const name = document.createElement('div');
+			name.className = 'name';
+			name.textContent = user.name;
+			left.appendChild(name);
+
+			row.appendChild(left);
+
+			const btn = document.createElement('button');
+			btn.className = 'request-btn';
+			btn.type = 'button';
+			btn.textContent = 'Send Request';
+			btn.setAttribute('data-user-id', user.id);
+
+			// Click opens modal
+			btn.addEventListener('click', ()=>{
+				activeRequestButton = btn;
+				activeUserId = user.id;
+				openModal(user);
+			});
+
+			row.appendChild(btn);
+			return row;
+		}
+
+		function renderList(){
+			friendsList.innerHTML = '';
+			users.forEach(u=>{
+				const r = createRow(u);
+				friendsList.appendChild(r);
+			});
+		}
+
+		function openModal(user){
+			document.getElementById('modalText').textContent = `Send friend request?`;
+			modalBackdrop.style.display = 'flex';
+			modalBackdrop.setAttribute('aria-hidden','false');
+			// focus send
+			modalSend.focus();
+		}
+
+		function closeModal(){
+			modalBackdrop.style.display = 'none';
+			modalBackdrop.setAttribute('aria-hidden','true');
+			activeRequestButton = null;
+			activeUserId = null;
+		}
+
+		modalCancel.addEventListener('click', ()=>{
+			closeModal();
+		});
+
+		modalBackdrop.addEventListener('click', (e)=>{
+			if(e.target === modalBackdrop) closeModal();
+		});
+
+		// Confirm send
+		modalSend.addEventListener('click', ()=>{
+			if(!activeRequestButton) return closeModal();
+			activeRequestButton.textContent = 'Request Sent';
+			activeRequestButton.disabled = true;
+			// Visually similar to Facebook disabled
+			activeRequestButton.style.background = '#E7F3FF';
+			activeRequestButton.style.color = '#6B8FCF';
+			activeRequestButton.style.boxShadow = 'none';
+			closeModal();
+		});
+
+		// keyboard accessibility
+		document.addEventListener('keydown', (e)=>{
+			if(e.key === 'Escape') closeModal();
+		});
+
+		// initial render
+		renderList();
+	</script>
+</body>
+</html>
+

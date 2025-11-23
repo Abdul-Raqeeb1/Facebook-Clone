@@ -306,3 +306,18 @@ def Add_Comment(request):
 
     return redirect('Homepage')
 
+
+def Video_Page(request):
+    return render(request, 'videos_section.html')   
+
+def Message_Page(request):
+    return render(request, 'message_section.html')
+
+def Market_Page(request):
+    return render(request, 'Market_Section.html')
+
+def Friends_Page(request):
+    return render(request, 'Friends_Section.html')
+
+def Requests_Page(request):
+    return render(request, 'Request_Section.html')

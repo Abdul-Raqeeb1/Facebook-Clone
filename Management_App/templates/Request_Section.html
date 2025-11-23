@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Messages</title>
+    <link rel="stylesheet" href="{% static 'css/facebookhome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+ 
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <!-- Left section -->
+      <div class="header-left">
+        <div class="logo">
+          <i class="fab fa-facebook"></i>
+        </div>
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search Facebook" />
+        </div>
+      </div>
+
+      <!-- Center navigation -->
+      <div class="header-center">
+        <a href="{% url 'Homepage' %}" class="nav-icon active">
+          <i class="fas fa-home"></i>
+        </a>
+        <a href="video_page" class="nav-icon">
+          <i class="fas fa-play"></i>
+        </a>
+        <a href="market_page" class="nav-icon">
+          <i class="fas fa-store"></i>
+        </a>
+        <a href="friends_page" class="nav-icon">
+          <i class="fas fa-users"></i>
+        </a>
+        <a href="#" class="nav-icon">
+          <i class="fas fa-gamepad"></i>
+        </a>
+      </div>
+
+      <!-- Right section -->
+      <div class="header-right">
+        <div class="action-button">
+          <i class="fas fa-plus"></i>
+        </div>
+        <div class="action-button">
+          <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
+        </div>
+        <div class="action-button">
+          <a href="requests_page"><i class="fas fa-bell"></i></a>
+        </div>
+        <div class="user-profile">
+          <a href="{% url 'User_Profile' %}"
+            ><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a
+          >
+        </div>
+      </div>
+    </header>
+    <br />
+    <br />
+    <br />
+
+
+  </body>
+</html>
+
+

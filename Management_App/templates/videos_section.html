@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Video Section</title>
+  <link rel="stylesheet" href="{% static 'css/facebookhome.css' %}">
+  <link rel="stylesheet" href="{% static 'css/facebookhome-mobile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/hide-mobile-icons.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script defer src="{% static 'js/app.js' %}"></script>
+  <style>
+    /* Facebook Watch 2025 - Video Section Styles (replaces .video-section / .video-row / .video-card) */
+    .video-section {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      /* increase top padding so section doesn't touch navbar */
+      padding: 44px 12px 60px;
+      box-sizing: border-box;
+      background: transparent;
+      scroll-behavior: smooth;
+    }
+
+    .video-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+
+    .video-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 6px 22px rgba(20,23,26,0.08);
+      overflow: hidden;
+      transition: transform 220ms cubic-bezier(.2,.8,.2,1), box-shadow 220ms;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    .video-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(20,23,26,0.12); }
+
+    .vc-uploader {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px 8px 16px;
+    }
+    .vc-uploader img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #eef3ff }
+    .vc-uploader .vc-name { font-weight:600; color:#050505; font-size:1rem }
+    .vc-uploader .vc-time { color:#616771; font-size:0.88rem; margin-left:6px }
+
+    .vc-player-wrap { width:100%; background:#000; display:flex; justify-content:center; align-items:center }
+    .vc-player {
+      width:100%;
+      height:auto;
+      max-height:520px;
+      object-fit:cover;
+      background:#000;
+      display:block;
+    }
+
+    .vc-body { padding: 12px 16px 16px 16px }
+    .vc-caption { color:#050505; font-size:0.98rem; line-height:1.45; margin-bottom:12px }
+
+    .vc-reactions {
+      display:flex; gap:12px; align-items:center; padding-bottom:8px
+    }
+    .btn-like, .btn-comment, .btn-share {
+      background:transparent; border:0; color:#606770; cursor:pointer; padding:8px 10px; border-radius:8px; font-weight:600
+    }
+    .btn-like.active { color:#1877f2; background:rgba(24,119,242,0.08) }
+    .btn-like .icon { display:inline-block; width:18px; height:18px; margin-right:8px; vertical-align:middle }
+
+    .vc-counters { display:flex; gap:16px; color:#616771; font-size:0.92rem; margin-top:6px }
+
+    .vc-comments { margin-top:10px }
+    .vc-comments-list { max-height:0; overflow:hidden; transition:max-height 300ms cubic-bezier(.2,.8,.2,1); }
+    .vc-comment { padding:8px 0; border-top:1px solid #f0f2f5; font-size:0.95rem }
+
+    /* Small screens */
+    @media (max-width:700px){
+      .video-section { padding: 16px 10px 56px }
+      .vc-player { max-height:360px }
+      .vc-uploader img { width:40px; height:40px }
+    }
+    /* Grid-based popular videos styling */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .grid-card { background: transparent; border-radius:10px; overflow:hidden }
+    .thumb { position:relative; width:100%; height:260px; background:#000; display:flex; align-items:center; justify-content:center; border-radius:8px; overflow:hidden }
+    .thumb-title {
+      position:absolute;
+      left:12px;
+      right:12px;
+      top:10px;
+      z-index:6;
+      background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+      color:#fff;
+      padding:6px 10px;
+      border-radius:8px;
+      font-weight:700;
+      font-size:0.98rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .thumb-video { max-height:100%; max-width:100%; object-fit:contain; display:block }
+    .duration { position:absolute; right:10px; bottom:8px; background:rgba(0,0,0,0.7); color:#fff; padding:4px 8px; border-radius:6px; font-weight:600; font-size:0.9rem }
+    .play-overlay { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); color:#fff; font-size:34px; opacity:0.95 }
+    .thumb-controls { position:absolute; right:10px; top:10px; display:flex; gap:8px; z-index:8; opacity:0; transform:translateY(0); transition:opacity 160ms ease, transform 160ms ease }
+    .grid-card:hover .thumb-controls { opacity:1 }
+    .control-btn { background:rgba(255,255,255,0.95); border-radius:8px; border:0; padding:6px 8px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(2,6,23,0.08) }
+    .control-btn i { color:#111; font-size:14px }
+    @media (hover:none){ .grid-card:hover .thumb-controls{ opacity:1 } }
+    .meta { display:flex; gap:12px; align-items:flex-start; padding:12px 2px }
+    .meta-avatar{ width:36px; height:36px; border-radius:50%; object-fit:cover }
+    .meta-texts { flex:1 }
+    .meta-title{ font-weight:600; color:#0f1720; font-size:1rem; line-height:1.25; margin-bottom:6px }
+    .meta-sub{ color:#6b7280; font-size:0.9rem }
+    @media (max-width:900px){ .video-grid{ grid-template-columns:1fr; } .thumb{ height:220px } }
+  </style>
+</head>
+<body>
+    <!-- Header/Navbar (copied from Facebook_Home.html) -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fab fa-facebook"></i>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search Facebook">
+            </div>
+        </div>
+        <div class="header-center">
+            <a href="homepage" class="nav-icon">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="video_page" class="nav-icon active">
+                <i class="fas fa-play"></i>
+            </a>
+            <a href="market_page" class="nav-icon">
+                <i class="fas fa-store"></i>
+            </a>
+            <a href="friends_page" class="nav-icon">
+                <i class="fas fa-users"></i>
+            </a>
+            <a href="#" class="nav-icon">
+                <i class="fas fa-gamepad"></i>
+            </a>
+        </div>
+        <div class="header-right">
+            <div class="action-button">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="action-button">
+                <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
+            </div>
+            <div class="action-button">
+                <a href="requests_page"><i class="fas fa-bell"></i></a>
+            </div>
+            <div class="user-profile">
+                <a href="{% url 'User_Profile' %}"><img src="{% static 'image/contact1.jpeg' %}" alt="Profile"></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Video Section (popular-style grid) -->
+    <div class="video-section">
+      <h1 style="margin:50px 0 14px 6px; font-size:1.7rem; color:#0f1720;">Video</h1>
+      <div class="video-grid">
+        <!-- Grid Card A -->
+        <div class="grid-card">
+          <div class="thumb">
+            <div class="thumb-title">ایک بار تو دیکھو سلطان مدینہ ہم جو بھی سیری محبوب</div>
+            <video class="thumb-video" playsinline preload="metadata" poster="{% static 'image/contact1.jpeg' %}">
+              <source src="{% static 'videos/video-1.mp4' %}" type="video/mp4">
+            </video>
+            <div class="duration">0:27</div>
+            <div class="play-overlay">▶</div>
+            <div class="thumb-controls" aria-hidden="true">
+              <button class="control-btn control-play" title="Play/Pause"><i class="fas fa-play"></i></button>
+              <button class="control-btn control-sound" title="Mute/Unmute"><i class="fas fa-volume-mute"></i></button>
+              <button class="control-btn control-full" title="Fullscreen"><i class="fas fa-expand"></i></button>
+            </div>
+          </div>
+          <div class="meta">
+            <img src="{% static 'image/contact1.jpeg' %}" alt="avatar" class="meta-avatar">
+            <div class="meta-texts">
+              <div class="meta-title">ایک بار تو دیکھو سلطان مدینہ ہم جو بھی سیری محبوب تیرا کلمہ تو پڑھا ہے</div>
+              <div class="meta-sub">Haji Shafique • <span class="views">1.5M views</span> • 1d ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Card B -->
+        <div class="grid-card">
+          <div class="thumb">
+            <div class="thumb-title">Lovely Flowers #flowers #fblifestyletyle</div>
+              <video class="thumb-video" muted playsinline preload="metadata">
+              <source src="{% static 'videos/video-11.mp4' %}" type="video/mp4">
+            </video>
+            <div class="duration">0:21</div>
+            <div class="play-overlay">▶</div>
+            <div class="thumb-controls" aria-hidden="true">
+              <button class="control-btn control-play" title="Play/Pause"><i class="fas fa-play"></i></button>
+              <button class="control-btn control-sound" title="Mute/Unmute"><i class="fas fa-volume-mute"></i></button>
+              <button class="control-btn control-full" title="Fullscreen"><i class="fas fa-expand"></i></button>
+            </div>
+          </div>
+          <div class="meta">
+            <img src="{% static 'image/contact2.jpeg' %}" alt="avatar" class="meta-avatar">
+            <div class="meta-texts">
+              <div class="meta-title">Lovely Flowers #flowers #fblifestyletyle</div>
+              <div class="meta-sub">Travel With Salman • <span class="views">4.6M views</span> • 2d ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- You can add more grid-card blocks here, or render with a Django loop -->
+      </div>
+    </div>
+
+    <script>
+    // Inline JS: no autoplay. Thumbnails remain paused until user explicitly plays.
+    (function(){
+      const thumbs = Array.from(document.querySelectorAll('.thumb-video'));
+      const grid = document.querySelector('.video-grid');
+
+      // Ensure videos are paused and reset; do not autoplay on intersection
+      thumbs.forEach(v => {
+        v.pause();
+        try{ v.currentTime = 0; } catch(e){}
+      });
+
+      // controls functionality: play/pause, mute, fullscreen
+      document.querySelectorAll('.grid-card').forEach(card=>{
+        const vid = card.querySelector('.thumb-video');
+        const overlay = card.querySelector('.play-overlay');
+        const playBtn = card.querySelector('.control-play');
+        const soundBtn = card.querySelector('.control-sound');
+        const fullBtn = card.querySelector('.control-full');
+
+        // overlay click toggles play (explicit user action)
+        if(overlay) overlay.addEventListener('click', ()=>{
+          if(vid.paused) { vid.play().catch(()=>{}); overlay.style.opacity='0'; if(playBtn) playBtn.innerHTML = '<i class="fas fa-pause"></i>' }
+          else { vid.pause(); overlay.style.opacity='0.95'; if(playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>' }
+        });
+
+        // play button
+        if(playBtn){
+          playBtn.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if(vid.paused){ vid.play().catch(()=>{}); playBtn.innerHTML = '<i class="fas fa-pause"></i>'; overlay.style.opacity='0' }
+            else { vid.pause(); playBtn.innerHTML = '<i class="fas fa-play"></i>'; overlay.style.opacity='0.95' }
+          });
+        }
+
+        // sound button
+        if(soundBtn){
+          soundBtn.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            vid.muted = !vid.muted;
+            soundBtn.innerHTML = vid.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+          });
+        }
+
+        // fullscreen button
+        if(fullBtn){
+          fullBtn.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if (vid.requestFullscreen) vid.requestFullscreen();
+            else if (vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
+            else if (vid.msRequestFullscreen) vid.msRequestFullscreen();
+          });
+        }
+
+        // touch: show controls on touch
+        card.addEventListener('touchstart', ()=>{
+          const controls = card.querySelector('.thumb-controls');
+          if(!controls) return;
+          controls.classList.add('visible'); controls.style.opacity = '1';
+        });
+      });
+
+      // Ensure mobile smooth scrolling
+      if(grid) grid.style.webkitOverflowScrolling = 'touch';
+    })();
+    </script>
+</body>
+</html>

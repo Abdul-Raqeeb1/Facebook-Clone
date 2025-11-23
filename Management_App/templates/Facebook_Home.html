@@ -10,6 +10,23 @@
     <link rel="stylesheet" href='{% static "css/hide-mobile-icons.css" %}'>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+        <style>
+        /* Make post cards size to their media (image/video) and wrap nicely */
+        .posts{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+        .post{display:inline-block;vertical-align:top;background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(3,19,35,0.04);width:auto;max-width:100%}
+        .post .post-content{display:inline-block}
+        .post .post-content img, .post .post-content video{display:block;width:auto;height:auto;max-width:100%;border-radius:8px}
+        /* ensure header area doesn't force a fixed width */
+        .post-header{display:flex;gap:8px;align-items:center}
+        .post .post-actions{width:100%;box-sizing:border-box}
+        /* on very small screens keep posts full-width */
+        @media (max-width:720px){
+            .posts{justify-content:center}
+            .post{width:100%;}
+        }
+        </style>
+
 </head>
 <body>
     <!-- Header -->
@@ -30,13 +47,13 @@
             <a href="{% url 'Homepage' %}" class="nav-icon active">
                 <i class="fas fa-home"></i>
             </a>
-            <a href="#" class="nav-icon">
+            <a href="video_page" class="nav-icon">
                 <i class="fas fa-play"></i>
             </a>
-            <a href="#" class="nav-icon">
+            <a href="market_page" class="nav-icon">
                 <i class="fas fa-store"></i>
             </a>
-            <a href="#" class="nav-icon">
+            <a href="friends_page" class="nav-icon">
                 <i class="fas fa-users"></i>
             </a>
             <a href="#" class="nav-icon">
@@ -50,10 +67,10 @@
                 <i class="fas fa-plus"></i>
             </div>
             <div class="action-button">
-                <i class="fab fa-facebook-messenger"></i>
+                <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
             </div>
             <div class="action-button">
-                <i class="fas fa-bell"></i>
+                <a href="requests_page"><i class="fas fa-bell"></i></a>
             </div>
             <div class="user-profile">
                 <a href="{% url 'User_Profile' %}"><img src="{% static "image/contact1.jpeg" %}" alt="Profile"></a>
