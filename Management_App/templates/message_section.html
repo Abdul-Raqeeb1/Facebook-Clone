@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -227,7 +228,7 @@
         }
       }
     </style>
-  </head>
+</head>
   <body>
     <!-- Header -->
     <header class="header">
@@ -287,17 +288,30 @@
       <div class="msger-wrap" id="msgerWrap">
         <div class="contacts">
           <div class="contacts-header"><h3>Messages</h3></div>
-          <div id="contactsList" class="contacts-list"></div>
+          <div class="contacts-list">
+            {% for friend in friends %}
+              <div class="contact-item" data-id="{{ friend.id }}" onclick="openConversation({{ friend.id }}, this, event)">
+                <img class="contact-avatar" src="{% static 'image/contact1.jpeg' %}" alt="{{ friend.get_full_name }}">
+                <div class="contact-info">
+                  <div class="contact-name">{{ friend.get_full_name|default:friend.username }}</div>
+                  <div class="contact-snippet">
+                    {% if conversations|get_item:friend.id %}
+                      {{ conversations|get_item:friend.id|get_item:'last_message'|truncatewords:3 }}
+                    {% else %}
+                      No messages yet
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div style="padding:12px;color:#6b7280;text-align:center">No friends yet. Add friends to start messaging!</div>
+            {% endfor %}
+          </div>
         </div>
         <div class="chat-panel">
           <div class="chat-header">
             <button id="backBtn" class="back-btn" aria-label="Back to contacts"><i class="fas fa-arrow-left"></i></button>
-            <img
-              id="chatAvatar"
-              class="chat-avatar"
-              src="{% static 'image/contact1.jpeg' %}"
-              alt="avatar"
-            />
+            <img id="chatAvatar" class="chat-avatar" src="{% static 'image/contact1.jpeg' %}" alt="avatar" />
             <div>
               <div id="chatName" class="chat-name">Select a conversation</div>
               <div class="chat-status">Active now</div>
@@ -305,11 +319,7 @@
           </div>
           <div id="chatMessages" class="chat-messages"></div>
           <div class="chat-composer">
-            <input
-              id="composerInput"
-              class="composer-input"
-              placeholder="Type a message..."
-            />
+            <input id="composerInput" class="composer-input" placeholder="Type a message..." />
             <button id="sendBtn" class="send-btn">Send</button>
           </div>
         </div>
@@ -319,42 +329,20 @@
 </html>
 
 <script>
-  // Minimal data for demonstration - replace with Django data if needed
-  const conversations = [
-    {
-      id: 1,
-      name: "Seth Foster",
-      avatar: '{% static "image/contact1.jpeg" %}',
-      last: "That's dumb lol",
-      time: "10:23am",
-      messages: [
-        { from: "them", text: "That's dumb lol", time: "10:23am" },
-        { from: "me", text: "you're dumb", time: "10:24am" },
-        { from: "me", text: "Am not", time: "10:25am" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Mel Porter",
-      avatar: '{% static "image/contact2.jpeg" %}',
-      last: "Messengerfordesktop.com",
-      time: "10:20am",
-      messages: [
-        { from: "them", text: "Messenger for Desktop", time: "10:20am" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Nova Alam",
-      avatar: '{% static "image/contact3.jpeg" %}',
-      last: "You: AND THEN",
-      time: "10:17am",
-      messages: [{ from: "them", text: "Yes they do", time: "10:17am" }],
-    },
+  {% load custom_filters %}
+  
+  // Friends data from server (passed in template context)
+  const friendsData = [
+    {% for friend in friends %}
+      {
+        id: {{ friend.id }},
+        name: "{{ friend.get_full_name|default:friend.username|escapejs }}",
+        avatar: '{% static "image/contact1.jpeg" %}',
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
   ];
 
   const msgerWrap = document.getElementById("msgerWrap");
-  const contactsList = document.getElementById("contactsList");
   const chatName = document.getElementById("chatName");
   const chatAvatar = document.getElementById("chatAvatar");
   const backBtn = document.getElementById('backBtn');
@@ -363,44 +351,34 @@
   const sendBtn = document.getElementById("sendBtn");
 
   let activeConv = null;
+  let messagePollingInterval = null;
+  const messageIds = new Set(); // Track message IDs to avoid duplicates
 
-  function renderContacts() {
-    contactsList.innerHTML = "";
-    conversations.forEach((conv) => {
-      const el = document.createElement("div");
-      el.className = "contact-item";
-      el.dataset.id = conv.id;
-      el.innerHTML = `
-                <img class="contact-avatar" src="${conv.avatar}">
-                <div class="contact-info">
-                    <div class="contact-name">${conv.name}</div>
-                    <div class="contact-snippet">${conv.last} · ${conv.time}</div>
-                </div>`;
-      el.addEventListener("click", () => openConversation(conv.id, el));
-      contactsList.appendChild(el);
-    });
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return v ? v.pop() : '';
   }
 
-  function openConversation(id, el) {
-    activeConv = conversations.find((c) => c.id == id);
-    // mark active
-    Array.from(document.querySelectorAll(".contact-item")).forEach((i) =>
-      i.classList.remove("active")
-    );
-    if (el) el.classList.add("active");
-    chatName.textContent = activeConv.name;
-    chatAvatar.src = activeConv.avatar;
-    chatMessages.innerHTML = "";
-    activeConv.messages.forEach((m) => appendMessage(m.from, m.text, m.time));
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    // On small screens, hide contacts to show chat
-    if (window.innerWidth <= 760 && msgerWrap) {
-      msgerWrap.classList.remove('show-contacts');
-      msgerWrap.classList.add("show-chat");
+  // Load messages from API for a friend
+  async function loadMessages(friendId) {
+    try {
+      const res = await fetch(`/api/get_messages/?friend_id=${friendId}`, {
+        credentials: 'same-origin'
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.error('Failed to load messages', e);
     }
+    return [];
   }
 
-  function appendMessage(from, text, time) {
+  function appendMessage(from, text, time, msgId) {
+    // Avoid duplicate messages
+    if (msgId && messageIds.has(msgId)) return;
+    if (msgId) messageIds.add(msgId);
+
     const row = document.createElement("div");
     row.className = "msg-row " + (from === "me" ? "msg-right" : "msg-left");
     const bubble = document.createElement("div");
@@ -417,17 +395,112 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  // Refresh messages silently (no full page reload)
+  async function refreshMessages() {
+    if (!activeConv) return; // Only refresh if a conversation is open
+    
+    const messages = await loadMessages(activeConv.id);
+    messages.forEach(m => {
+      appendMessage(m.from_me ? "me" : "them", m.text, m.time, m.id);
+    });
+  }
+
+  // Start polling for new messages when conversation opens
+  function startMessagePolling() {
+    if (messagePollingInterval) clearInterval(messagePollingInterval);
+    messagePollingInterval = setInterval(() => {
+      refreshMessages();
+    }, 5000); // Poll every 5 seconds
+  }
+
+  // Stop polling when conversation closes
+  function stopMessagePolling() {
+    if (messagePollingInterval) {
+      clearInterval(messagePollingInterval);
+      messagePollingInterval = null;
+    }
+  }
+
+  function openConversation(friendId, el, e) {
+    if (e) e.preventDefault();
+    
+    activeConv = friendsData.find(f => f.id === friendId);
+    if (!activeConv) return;
+
+    // Mark active
+    Array.from(document.querySelectorAll(".contact-item")).forEach(i => i.classList.remove("active"));
+    if (el) el.classList.add("active");
+
+    chatName.textContent = activeConv.name;
+    chatAvatar.src = activeConv.avatar;
+    chatMessages.innerHTML = '<div style="text-align:center;color:#6b7280">Loading messages...</div>';
+    messageIds.clear(); // Clear message tracking
+
+    // Load messages from API
+    loadMessages(friendId).then(messages => {
+      chatMessages.innerHTML = '';
+      messages.forEach(m => {
+        appendMessage(m.from_me ? "me" : "them", m.text, m.time, m.id);
+      });
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      startMessagePolling(); // Start polling when chat opens
+    });
+
+    // On small screens, show chat
+    if (window.innerWidth <= 760 && msgerWrap) {
+      msgerWrap.classList.remove('show-contacts');
+      msgerWrap.classList.add("show-chat");
+    }
+  }
+
   sendBtn.addEventListener("click", () => {
+    if (!activeConv) return;
     const text = composerInput.value.trim();
-    if (!text || !activeConv) return;
-    const now = new Date();
-    const time =
-      now.getHours() +
-      ":" +
-      (now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes());
-    activeConv.messages.push({ from: "me", text, time });
-    appendMessage("me", text, time);
-    composerInput.value = "";
+    if (!text) return;
+
+    const csrftoken = getCookie('csrftoken');
+    const body = new URLSearchParams();
+    body.append('to_id', String(activeConv.id));
+    body.append('text', text);
+
+    // Disable button to prevent double-send
+    sendBtn.disabled = true;
+    composerInput.disabled = true;
+
+    fetch('/api/send_message/', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: body.toString(),
+    }).then(res => {
+      if (res.ok) {
+        composerInput.value = "";
+        // Reload messages from API (only load from server, don't duplicate)
+        setTimeout(() => {
+          loadMessages(activeConv.id).then(messages => {
+            chatMessages.innerHTML = ''; // Clear all
+            messageIds.clear();
+            messages.forEach(m => {
+              appendMessage(m.from_me ? "me" : "them", m.text, m.time, m.id);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            startMessagePolling(); // Restart polling
+          });
+        }, 300);
+      } else {
+        alert('Failed to send message');
+      }
+    }).catch(e => {
+      console.error('Send error', e);
+      alert('Network error');
+    }).finally(() => {
+      // Re-enable button
+      sendBtn.disabled = false;
+      composerInput.disabled = false;
+    });
   });
 
   composerInput.addEventListener("keydown", (e) => {
@@ -437,42 +510,27 @@
     }
   });
 
-  // Initialize
-  renderContacts();
-  // open first conversation by default
-  setTimeout(() => {
-    const first = document.querySelector(".contact-item");
-    if (first) first.click();
-  }, 50);
-
-  // Allow tapping the avatar to return to contacts on small screens
-  document.addEventListener("click", (e) => {
-    if (
-      e.target &&
-      e.target.id === "chatAvatar" &&
-      window.innerWidth <= 760 &&
-      msgerWrap
-    ) {
-      msgerWrap.classList.remove("show-chat");
-      msgerWrap.classList.add('show-contacts');
-    }
-  });
-
-  // Back button to return to contacts on mobile
-  if(backBtn){
-    backBtn.addEventListener('click', ()=>{
-      if(window.innerWidth <= 760 && msgerWrap){
+  // Back button for mobile
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 760 && msgerWrap) {
         msgerWrap.classList.remove('show-chat');
         msgerWrap.classList.add('show-contacts');
+        stopMessagePolling(); // Stop polling when going back to contacts
       }
     });
   }
 
-  // On resize remove mobile classes when switching to desktop
+  // On resize
   window.addEventListener("resize", () => {
     if (window.innerWidth > 760 && msgerWrap) {
       msgerWrap.classList.remove("show-chat");
       msgerWrap.classList.remove("show-contacts");
     }
+  });
+
+  // Stop polling when user leaves the page
+  window.addEventListener("beforeunload", () => {
+    stopMessagePolling();
   });
 </script>

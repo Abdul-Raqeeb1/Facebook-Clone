@@ -19,5 +19,15 @@ urlpatterns = [
     path('market_page', views.Market_Page, name='Market_Page'),
     path('friends_page', views.Friends_Page, name='Friends_Page'),
     path('requests_page', views.Requests_Page, name='Requests_Page'),
+    # API endpoints for friend requests and messages
+    path('api/send_request/', views.api_send_request, name='api_send_request'),
+    path('api/list_requests/', views.api_list_requests, name='api_list_requests'),
+    path('api/accept_request/', views.api_accept_request, name='api_accept_request'),
+    path('api/delete_request/', views.api_delete_request, name='api_delete_request'),
+    path('api/send_message/', views.api_send_message, name='api_send_message'),
+    path('api/list_conversations/', views.api_list_conversations, name='api_list_conversations'),
+    path('api/get_messages/', views.api_get_messages, name='api_get_messages'),
+    path('api/check_friend_status/', views.api_check_friend_status, name='api_check_friend_status'),
+    path('api/friend_status/', views.api_check_friend_status, name='api_friend_status'),
     # path('show_posts', views.Show_Posts, name='Show_Posts'),
 ]

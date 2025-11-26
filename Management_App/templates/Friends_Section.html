@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>Friends Sidebar</title>
     {% load static %}
+	{% load custom_filters %}
     <link rel="stylesheet" href="{% static 'css/facebookhome.css' %}">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<style>
@@ -118,7 +119,36 @@
 		<aside class="right-sidebar">
 			<div class="friends-panel" role="complementary" aria-label="People you may know">
 				<div class="panel-title">People You May Know</div>
-				<div id="friendsList"></div>
+				
+				<!-- Friend rows rendered from server -->
+				<div class="friends-list">
+					{% for user in users %}
+						<div class="friend-row">
+							<div class="left">
+								<!-- Avatar with initials -->
+								<div class="avatar">
+									<div class="avatar-initials" style="background:#6C5CE7">
+										{{ user.first_name|default:""|slice:":1"|upper }}{{ user.last_name|default:""|slice:":1"|upper }}
+									</div>
+								</div>
+								<div class="name">{{ user.get_full_name|default:user.username }}</div>
+							</div>
+
+							<!-- Action Button -->
+							{% if user.id in friend_ids %}
+								<button class="request-btn" disabled>Friends</button>
+							{% elif user.id in outgoing_ids %}
+								<button class="request-btn" disabled>Request Sent</button>
+							{% elif user.id in incoming_ids %}
+								<button class="request-btn" data-fr-id="{{ incoming_map|get_item:user.id }}" data-user-id="{{ user.id }}" onclick="acceptRequest(this, event)">Confirm</button>
+							{% else %}
+								<button class="request-btn" data-user-id="{{ user.id }}" onclick="openModal(this, '{{ user.get_full_name|default:user.username }}', event)">Add Friend</button>
+							{% endif %}
+						</div>
+					{% empty %}
+						<div style="padding:12px;color:#6b7280;text-align:center">No users available</div>
+					{% endfor %}
+				</div>
 			</div>
 		</aside>
 	</div>
@@ -128,139 +158,85 @@
 		<div class="modal" role="document">
 			<p id="modalText">Send friend request?</p>
 			<div class="controls">
-				<button id="modalCancel" class="btn-cancel">Cancel</button>
-				<button id="modalSend" class="btn-send">Send</button>
+				<button class="btn-cancel" onclick="closeModal()">Cancel</button>
+				<button class="btn-send" onclick="sendRequest()">Send</button>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		// Sample users array
-		const users = [
-			{id:1, name:'Aisha Khan', initials:'AK', online:true, color:'#6C5CE7', img: '{% static "image/contact1.jpeg" %}'},
-			{id:2, name:'Omar Ali', initials:'OA', online:false, color:'#00B894', img: '{% static "image/contact2.jpeg" %}'},
-			{id:3, name:'Fatima Noor', initials:'FN', online:true, color:'#0984E3', img: '{% static "image/contact3.jpeg" %}'},
-			{id:4, name:'Samuel Lee', initials:'SL', online:true, color:'#FF7675', img: '{% static "image/contact4.jpeg" %}'},
-			{id:5, name:'Priya Singh', initials:'PS', online:false, color:'#FD79A8', img: '{% static "image/contact1.jpeg" %}'}
-		];
-
-		const friendsList = document.getElementById('friendsList');
-		const modalBackdrop = document.getElementById('modalBackdrop');
-		const modalCancel = document.getElementById('modalCancel');
-		const modalSend = document.getElementById('modalSend');
-		let activeRequestButton = null;
 		let activeUserId = null;
 
-		function createAvatar(user){
-			const wrap = document.createElement('div');
-			wrap.className = 'avatar';
-
-			if(user.img){
-				const img = document.createElement('img');
-				img.src = user.img;
-				img.alt = user.name;
-				wrap.appendChild(img);
-			} else {
-				// fallback to initials
-				const inner = document.createElement('div');
-				inner.className = 'avatar-initials';
-				inner.style.background = user.color;
-				inner.textContent = user.initials;
-				wrap.appendChild(inner);
-			}
-
-			if(user.online){
-				const dot = document.createElement('span');
-				dot.className = 'online-dot';
-				wrap.appendChild(dot);
-			}
-			return wrap;
+		function getCookie(name) {
+			const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+			return v ? v.pop() : '';
 		}
 
-		function createRow(user){
-			const row = document.createElement('div');
-			row.className = 'friend-row';
-
-			const left = document.createElement('div');
-			left.className = 'left';
-
-			const avatar = createAvatar(user);
-			left.appendChild(avatar);
-
-			const name = document.createElement('div');
-			name.className = 'name';
-			name.textContent = user.name;
-			left.appendChild(name);
-
-			row.appendChild(left);
-
-			const btn = document.createElement('button');
-			btn.className = 'request-btn';
-			btn.type = 'button';
-			btn.textContent = 'Send Request';
-			btn.setAttribute('data-user-id', user.id);
-
-			// Click opens modal
-			btn.addEventListener('click', ()=>{
-				activeRequestButton = btn;
-				activeUserId = user.id;
-				openModal(user);
-			});
-
-			row.appendChild(btn);
-			return row;
+		function openModal(btn, userName, e) {
+			e.preventDefault();
+			activeUserId = btn.dataset.userId;
+			document.getElementById('modalText').textContent = `Send friend request to ${userName}?`;
+			document.getElementById('modalBackdrop').style.display = 'flex';
+			document.querySelector('.btn-send').focus();
 		}
 
-		function renderList(){
-			friendsList.innerHTML = '';
-			users.forEach(u=>{
-				const r = createRow(u);
-				friendsList.appendChild(r);
-			});
-		}
-
-		function openModal(user){
-			document.getElementById('modalText').textContent = `Send friend request?`;
-			modalBackdrop.style.display = 'flex';
-			modalBackdrop.setAttribute('aria-hidden','false');
-			// focus send
-			modalSend.focus();
-		}
-
-		function closeModal(){
-			modalBackdrop.style.display = 'none';
-			modalBackdrop.setAttribute('aria-hidden','true');
-			activeRequestButton = null;
+		function closeModal() {
+			document.getElementById('modalBackdrop').style.display = 'none';
 			activeUserId = null;
 		}
 
-		modalCancel.addEventListener('click', ()=>{
-			closeModal();
+		function sendRequest() {
+			if (!activeUserId) return;
+			
+			const csrftoken = getCookie('csrftoken');
+			const body = new URLSearchParams();
+			body.append('to_id', String(activeUserId));
+
+			fetch('/api/send_request/', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {
+					'X-CSRFToken': csrftoken,
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				body: body.toString(),
+			}).then(resp => {
+				if(resp.ok) {
+					closeModal();
+					setTimeout(() => location.reload(), 300);
+				} else {
+					alert('Failed to send request');
+				}
+			}).catch(err => {
+				alert('Network error');
+			});
+		}
+
+		function acceptRequest(btn, e) {
+			e.preventDefault();
+			const frId = btn.dataset.frId;
+			if (!frId) return;
+			
+			const csrftoken = getCookie('csrftoken');
+			fetch('/api/accept_request/', {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded'},
+				body: `fr_id=${encodeURIComponent(frId)}`
+			}).then(resp => {
+				if(resp.ok) location.reload();
+			});
+		}
+
+		// Close modal on Escape key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') closeModal();
 		});
 
-		modalBackdrop.addEventListener('click', (e)=>{
-			if(e.target === modalBackdrop) closeModal();
+		// Close modal on backdrop click
+		document.getElementById('modalBackdrop').addEventListener('click', (e) => {
+			if (e.target === document.getElementById('modalBackdrop')) closeModal();
 		});
-
-		// Confirm send
-		modalSend.addEventListener('click', ()=>{
-			if(!activeRequestButton) return closeModal();
-			activeRequestButton.textContent = 'Request Sent';
-			activeRequestButton.disabled = true;
-			// Visually similar to Facebook disabled
-			activeRequestButton.style.background = '#E7F3FF';
-			activeRequestButton.style.color = '#6B8FCF';
-			activeRequestButton.style.boxShadow = 'none';
-			closeModal();
-		});
-
-		// keyboard accessibility
-		document.addEventListener('keydown', (e)=>{
-			if(e.key === 'Escape') closeModal();
-		});
-
-		// initial render
-		renderList();
 	</script>
 </body>
 </html>

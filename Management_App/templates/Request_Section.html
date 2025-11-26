@@ -136,83 +136,65 @@
           <a class="see-all" href="#">See All</a>
         </div>
 
-        <div id="requestsGrid" class="requests-grid" aria-live="polite"></div>
+        <!-- Requests Grid -->
+        <div class="requests-grid" aria-live="polite">
+          {% for request in incoming_requests %}
+            <div class="req-card">
+              <img class="req-image" src="{% static 'image/contact1.jpeg' %}" alt="{{ request.from_user.get_full_name }}">
+              <div class="req-body">
+                <div class="req-name">{{ request.from_user.get_full_name|default:request.from_user.username }}</div>
+                <div class="req-mutual">0 mutual friends</div>
+                <div class="req-actions">
+                  <button class="btn-confirm" onclick="acceptRequest({{ request.id }}, event)">Confirm</button>
+                  <button class="btn-delete" onclick="deleteRequest({{ request.id }}, event)">Delete</button>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div style="grid-column:1/-1;padding:18px;color:#6b7280;text-align:center">
+              No incoming friend requests.
+            </div>
+          {% endfor %}
+        </div>
       </main>
     </div>
 
     <script>
-      // Sample friend requests data (use your real data in Django later)
-      const requests = [
-        {id:1, name:'Moni A. Castro', mutual:26, img:'{% static "image/contact1.jpeg" %}'},
-        {id:2, name:'Carley Mckenzie', mutual:166, img:'{% static "image/contact2.jpeg" %}'},
-        {id:3, name:'Mono Bay', mutual:3, img:'{% static "image/contact3.jpeg" %}'},
-        {id:4, name:'Anthony Bomber', mutual:3, img:'{% static "image/contact4.jpeg" %}'},
-        {id:5, name:'Sarah Lee', mutual:12, img:'{% static "image/contact1.jpeg" %}'},
-        {id:6, name:'Peter Kim', mutual:4, img:'{% static "image/contact2.jpeg" %}'}
-      ];
+      function getCookie(name) {
+        const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return v ? v.pop() : '';
+      }
 
-      const grid = document.getElementById('requestsGrid');
-
-      function renderRequests(){
-        grid.innerHTML = '';
-        requests.forEach(r=>{
-          const card = document.createElement('div');
-          card.className = 'req-card';
-
-          const img = document.createElement('img');
-          img.className = 'req-image';
-          img.src = r.img;
-          img.alt = r.name;
-          card.appendChild(img);
-
-          const body = document.createElement('div');
-          body.className = 'req-body';
-
-          const name = document.createElement('div');
-          name.className = 'req-name';
-          name.textContent = r.name;
-          body.appendChild(name);
-
-          const mutual = document.createElement('div');
-          mutual.className = 'req-mutual';
-          mutual.textContent = `${r.mutual} mutual friends`;
-          body.appendChild(mutual);
-
-          const actions = document.createElement('div');
-          actions.className = 'req-actions';
-
-          const confirm = document.createElement('button');
-          confirm.className = 'btn-confirm';
-          confirm.textContent = 'Confirm';
-          confirm.addEventListener('click', ()=>{
-            confirm.textContent = 'Friends';
-            confirm.disabled = true;
-            confirm.style.opacity = '0.85';
-          });
-
-          const del = document.createElement('button');
-          del.className = 'btn-delete';
-          del.textContent = 'Delete';
-          del.addEventListener('click', ()=>{
-            // remove from array and re-render
-            const idx = requests.findIndex(x=>x.id===r.id);
-            if(idx>-1) requests.splice(idx,1);
-            renderRequests();
-          });
-
-          actions.appendChild(confirm);
-          actions.appendChild(del);
-          body.appendChild(actions);
-
-          card.appendChild(body);
-          grid.appendChild(card);
+      function acceptRequest(frId, e) {
+        e.preventDefault();
+        const csrftoken = getCookie('csrftoken');
+        fetch('/api/accept_request/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `fr_id=${encodeURIComponent(frId)}`
+        }).then(resp => {
+          if(resp.ok) location.reload();
         });
       }
 
-      renderRequests();
+      function deleteRequest(frId, e) {
+        e.preventDefault();
+        const csrftoken = getCookie('csrftoken');
+        fetch('/api/delete_request/', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `fr_id=${encodeURIComponent(frId)}`
+        }).then(resp => {
+          if(resp.ok) location.reload();
+        });
+      }
+
+      // Refresh requests every 10 seconds
+      setInterval(() => location.reload(), 10000);
     </script>
+
 
   </body>
 </html>
-
-
