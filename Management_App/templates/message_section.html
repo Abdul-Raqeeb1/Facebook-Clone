@@ -19,16 +19,47 @@
         --card: #ffffff;
         --muted: #6b7280;
         --accent: #0b84ff;
+        --text: #0b1220;
+      }
+
+      body.dark-mode {
+        --bg: #0f0f0f;
+        --card: #1a1a1a;
+        --muted: #888888;
+        --text: #e0e0e0;
       }
 
       body {
         background: var(--bg);
         font-family: Inter, system-ui, Arial, sans-serif;
-        color: #0b1220;
+        color: var(--text);
+        transition: background 0.3s, color 0.3s;
       }
 
       .spacer {
         height: 20px;
+      }
+
+      /* Dark mode toggle */
+      .theme-toggle {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: var(--card);
+        border: 1px solid #e0e0e0;
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        color: var(--text);
+        transition: all 0.3s;
+      }
+
+      body.dark-mode .theme-toggle {
+        border-color: #333;
+        color: #ffffff;
       }
 
       /* Two-panel layout: fixed contacts column + flexible chat column. Full-width on desktop. */
@@ -49,11 +80,17 @@
         box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06);
         overflow: hidden;
         height: calc(100vh - 140px);
+        color: var(--text);
       }
       .contacts-header {
         padding: 18px 18px 8px 18px;
         border-bottom: 1px solid #eef2f6;
       }
+
+      body.dark-mode .contacts-header {
+        border-bottom-color: #333;
+      }
+
       .contacts-header h3 {
         margin: 0;
         font-size: 18px;
@@ -70,10 +107,29 @@
         align-items: center;
         cursor: pointer;
         border-bottom: 1px solid #f2f4f6;
+        transition: background 0.2s;
       }
+
+      body.dark-mode .contact-item {
+        border-bottom-color: #333;
+      }
+
+      .contact-item:hover {
+        background: #f9f9f9;
+      }
+
+      body.dark-mode .contact-item:hover {
+        background: #222;
+      }
+
       .contact-item.active {
         background: linear-gradient(90deg, #f6fbff, #ffffff);
       }
+
+      body.dark-mode .contact-item.active {
+        background: linear-gradient(90deg, #1a2a3a, #222);
+      }
+
       .contact-avatar {
         width: 44px;
         height: 44px;
@@ -88,7 +144,7 @@
       .contact-name {
         font-weight: 600;
         font-size: 14px;
-        color: #081226;
+        color: var(--text);
       }
       .contact-snippet {
         color: var(--muted);
@@ -117,7 +173,13 @@
         align-items: center;
         padding: 14px 16px;
         border-bottom: 1px solid #eef2f6;
+        color: var(--text);
       }
+
+      body.dark-mode .chat-header {
+        border-bottom-color: #333;
+      }
+
       .back-btn{
         display:none;
         background:transparent;
@@ -136,6 +198,7 @@
       }
       .chat-name {
         font-weight: 700;
+        color: var(--text);
       }
       .chat-status {
         font-size: 12px;
@@ -149,8 +212,46 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
-        background: linear-gradient(#fff, #fff);
+        background: var(--bg);
         min-height: 320px;
+      }
+
+      /* Scroll-to-latest floating button */
+      .scroll-down-btn {
+        position: absolute;
+        right: 29px;
+        bottom: 131px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        border: 0;
+        cursor: pointer;
+        z-index: 50;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.18s ease, transform 0.18s ease, background 0.15s;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .scroll-down-btn.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      body.dark-mode .scroll-down-btn {
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+      }
+
+      .scroll-down-btn:hover {
+        background: rgba(0,0,0,0.85);
       }
       .msg-row {
         display: flex;
@@ -170,6 +271,12 @@
         color: #081226;
         font-size: 14px;
       }
+
+      body.dark-mode .bubble {
+        background: #333;
+        color: #e0e0e0;
+      }
+
       .bubble.me {
         background: var(--accent);
         color: #fff;
@@ -186,14 +293,93 @@
         padding: 12px;
         border-top: 1px solid #eef2f6;
         align-items: center;
+        position: relative;
       }
+
+      body.dark-mode .chat-composer {
+        border-top-color: #333;
+      }
+
+      .composer-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .composer-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: var(--muted);
+        padding: 6px;
+        border-radius: 6px;
+        transition: background 0.2s;
+      }
+
+      .composer-btn:hover {
+        background: rgba(0,0,0,0.08);
+      }
+
+      body.dark-mode .composer-btn:hover {
+        background: rgba(255,255,255,0.08);
+      }
+
+      .emoji-picker {
+        position: absolute;
+        bottom: 54px;
+        left: 12px;
+        background: var(--card);
+        border: 1px solid #eef2f6;
+        border-radius: 8px;
+        padding: 12px;
+        display: none;
+        z-index: 100;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      }
+
+      body.dark-mode .emoji-picker {
+        border-color: #333;
+      }
+
+      .emoji-picker.visible {
+        display: grid;
+      }
+
+      .emoji-item {
+        font-size: 24px;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+
+      .emoji-item:hover {
+        background: #f2f4f6;
+      }
+
+      body.dark-mode .emoji-item:hover {
+        background: #333;
+      }
+
       .composer-input {
         flex: 1;
         border-radius: 22px;
         padding: 10px 14px;
         border: 1px solid #e6edf3;
         outline: none;
+        background: var(--card);
+        color: var(--text);
       }
+
+      body.dark-mode .composer-input {
+        border-color: #333;
+        background: #222;
+      }
+
       .send-btn {
         background: var(--accent);
         color: #fff;
@@ -201,6 +387,12 @@
         padding: 8px 14px;
         border-radius: 18px;
         cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
 
       /* Small screen: stack and add toggle behavior */
@@ -225,6 +417,13 @@
         .back-btn{ display:inline-flex; align-items:center; justify-content:center }
         .chat-panel {
           height: calc(100vh - 170px);
+        }
+        .theme-toggle {
+          top: 70px;
+          right: 10px;
+        }
+        .scroll-down-btn {
+          bottom: 167px;
         }
       }
     </style>
@@ -268,10 +467,10 @@
           <i class="fas fa-plus"></i>
         </div>
         <div class="action-button">
-          <a href="message_page"><i class="fab fa-facebook-messenger"></i></a>
+          <a href="message_page" style="color:#aaa;"><i class="fab fa-facebook-messenger"></i></a>
         </div>
         <div class="action-button">
-          <a href="requests_page"><i class="fas fa-bell"></i></a>
+          <a href="requests_page" style="color:#aaa;"><i class="fas fa-bell"></i></a>
         </div>
         <div class="user-profile">
           <a href="{% url 'User_Profile' %}"
@@ -283,6 +482,11 @@
     <br />
     <br />
     <br />
+
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+      <span id="themeIcon">🌙</span> Dark
+    </button>
 
     <div class="chat-container">
       <div class="msger-wrap" id="msgerWrap">
@@ -318,7 +522,30 @@
             </div>
           </div>
           <div id="chatMessages" class="chat-messages"></div>
+          <button id="scrollDownBtn" class="scroll-down-btn" title="Go to latest">⬇</button>
           <div class="chat-composer">
+            <div class="composer-actions">
+              <button class="composer-btn" id="emojiBtn" title="Emoji">😊</button>
+              <button class="composer-btn" id="fileBtn" title="Attach file">📎</button>
+              <button class="composer-btn" id="docBtn" title="Attach document">📄</button>
+            </div>
+            <div id="emojiPicker" class="emoji-picker">
+              <div class="emoji-item">😊</div>
+              <div class="emoji-item">😂</div>
+              <div class="emoji-item">❤️</div>
+              <div class="emoji-item">👍</div>
+              <div class="emoji-item">🎉</div>
+              <div class="emoji-item">🔥</div>
+              <div class="emoji-item">💯</div>
+              <div class="emoji-item">😍</div>
+              <div class="emoji-item">😢</div>
+              <div class="emoji-item">😡</div>
+              <div class="emoji-item">👏</div>
+              <div class="emoji-item">🙏</div>
+              <div class="emoji-item">😎</div>
+              <div class="emoji-item">🤔</div>
+              <div class="emoji-item">😴</div>
+            </div>
             <input id="composerInput" class="composer-input" placeholder="Type a message..." />
             <button id="sendBtn" class="send-btn">Send</button>
           </div>
@@ -330,6 +557,59 @@
 
 <script>
   {% load custom_filters %}
+  
+  // ===== DARK MODE =====
+  function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    document.documentElement.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    updateThemeIcon();
+  }
+
+  function updateThemeIcon() {
+    const icon = document.getElementById('themeIcon');
+    if (document.body.classList.contains('dark-mode')) {
+      icon.textContent = '☀️';
+    } else {
+      icon.textContent = '🌙';
+    }
+  }
+
+  // Load saved theme preference on page load
+  function initTheme() {
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.documentElement.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark-mode');
+    }
+    updateThemeIcon();
+  }
+
+  // Initialize theme immediately
+  initTheme();
+
+  // ===== BROWSER NOTIFICATIONS =====
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  function showNotification(title, options = {}) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        icon: '{% static "image/contact1.jpeg" %}',
+        ...options
+      });
+    }
+  }
+
+  // Request notification permission on load
+  window.addEventListener('load', requestNotificationPermission);
+
+  // ===== MESSAGING =====
   
   // Friends data from server (passed in template context)
   const friendsData = [
@@ -349,10 +629,17 @@
   const chatMessages = document.getElementById("chatMessages");
   const composerInput = document.getElementById("composerInput");
   const sendBtn = document.getElementById("sendBtn");
+  const scrollDownBtn = document.getElementById('scrollDownBtn');
+  const emojiBtn = document.getElementById('emojiBtn');
+  const emojiPicker = document.getElementById('emojiPicker');
+  const fileBtn = document.getElementById('fileBtn');
+  const docBtn = document.getElementById('docBtn');
+  const emojiItems = document.querySelectorAll('.emoji-item');
 
   let activeConv = null;
   let messagePollingInterval = null;
   const messageIds = new Set(); // Track message IDs to avoid duplicates
+  let autoScrollEnabled = true; // when true, new messages auto-scroll to bottom
 
   function getCookie(name) {
     const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
@@ -366,7 +653,11 @@
         credentials: 'same-origin'
       });
       if (res.ok) {
-        return await res.json();
+        const data = await res.json();
+        console.debug('Loaded messages for', friendId, 'count=', data.length);
+        return data;
+      } else {
+        console.warn('Failed to load messages, status=', res.status);
       }
     } catch (e) {
       console.error('Failed to load messages', e);
@@ -379,30 +670,58 @@
     if (msgId && messageIds.has(msgId)) return;
     if (msgId) messageIds.add(msgId);
 
+    const container = document.createElement("div");
+    container.className = "msg-wrapper";
+    
     const row = document.createElement("div");
     row.className = "msg-row " + (from === "me" ? "msg-right" : "msg-left");
+    
     const bubble = document.createElement("div");
     bubble.className = "bubble " + (from === "me" ? "me" : "");
     bubble.textContent = text;
     row.appendChild(bubble);
+    
     const meta = document.createElement("div");
     meta.className = "msg-meta";
     meta.textContent = time || "";
-    const container = document.createElement("div");
+    
     container.appendChild(row);
     container.appendChild(meta);
     chatMessages.appendChild(container);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // If auto-scroll is enabled, scroll to bottom. Otherwise show scroll button.
+    setTimeout(() => {
+      if (autoScrollEnabled) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } else if (scrollDownBtn) {
+        scrollDownBtn.classList.add('visible');
+      }
+    }, 0);
+
+    // Show notification for incoming messages
+    if (from === "them" && msgId && activeConv) {
+      showNotification(`Message from ${activeConv.name}`, {
+        body: text.substring(0, 50),
+        tag: `msg-${msgId}`
+      });
+    }
   }
 
   // Refresh messages silently (no full page reload)
   async function refreshMessages() {
     if (!activeConv) return; // Only refresh if a conversation is open
-    
     const messages = await loadMessages(activeConv.id);
+    // Rebuild the entire message list each refresh to ensure older messages appear
+    chatMessages.innerHTML = '';
+    messageIds.clear();
+    console.debug('Rebuilding messages view, total=', messages.length);
     messages.forEach(m => {
       appendMessage(m.from_me ? "me" : "them", m.text, m.time, m.id);
     });
+    // If autoScrollEnabled, ensure view is at bottom after rebuild
+    if (autoScrollEnabled) {
+      setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 0);
+    }
   }
 
   // Start polling for new messages when conversation opens
@@ -433,8 +752,11 @@
 
     chatName.textContent = activeConv.name;
     chatAvatar.src = activeConv.avatar;
-    chatMessages.innerHTML = '<div style="text-align:center;color:#6b7280">Loading messages...</div>';
+    chatMessages.innerHTML = '<div style="text-align:center;color:var(--muted)">Loading messages...</div>';
     messageIds.clear(); // Clear message tracking
+    // Opening a conversation enables auto-scroll by default
+    autoScrollEnabled = true;
+    if (scrollDownBtn) scrollDownBtn.classList.remove('visible');
 
     // Load messages from API
     loadMessages(friendId).then(messages => {
@@ -442,7 +764,9 @@
       messages.forEach(m => {
         appendMessage(m.from_me ? "me" : "them", m.text, m.time, m.id);
       });
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      if (autoScrollEnabled) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
       startMessagePolling(); // Start polling when chat opens
     });
 
@@ -479,6 +803,9 @@
       if (res.ok) {
         composerInput.value = "";
         // Reload messages from API (only load from server, don't duplicate)
+        // re-enable auto-scroll when user sends a message so sender sees it immediately
+        autoScrollEnabled = true;
+        if (scrollDownBtn) scrollDownBtn.classList.remove('visible');
         setTimeout(() => {
           loadMessages(activeConv.id).then(messages => {
             chatMessages.innerHTML = ''; // Clear all
@@ -500,6 +827,7 @@
       // Re-enable button
       sendBtn.disabled = false;
       composerInput.disabled = false;
+      composerInput.focus();
     });
   });
 
@@ -520,6 +848,82 @@
       }
     });
   }
+
+  // Scroll handling: show/hide scroll-to-latest button based on user's scroll position
+  if (chatMessages && scrollDownBtn) {
+    chatMessages.addEventListener('scroll', () => {
+      const distanceFromBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight;
+      const nearBottom = distanceFromBottom <= 60;
+      if (nearBottom) {
+        // user at/near bottom - hide button and allow auto-scroll
+        autoScrollEnabled = true;
+        scrollDownBtn.classList.remove('visible');
+      } else {
+        // user scrolled up - disable auto-scroll and show button
+        autoScrollEnabled = false;
+        scrollDownBtn.classList.add('visible');
+      }
+    });
+
+    // Click the button to scroll to bottom and re-enable auto-scroll
+    scrollDownBtn.addEventListener('click', () => {
+      autoScrollEnabled = true;
+      chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+      scrollDownBtn.classList.remove('visible');
+    });
+  }
+
+  // Emoji picker toggle
+  emojiBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    emojiPicker.classList.toggle('visible');
+  });
+
+  // Insert emoji into input
+  emojiItems.forEach(item => {
+    item.addEventListener('click', () => {
+      composerInput.value += item.textContent;
+      composerInput.focus();
+      emojiPicker.classList.remove('visible');
+    });
+  });
+
+  // Close emoji picker when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#emojiBtn') && !e.target.closest('#emojiPicker')) {
+      emojiPicker.classList.remove('visible');
+    }
+  });
+
+  // File attachment handling
+  fileBtn.addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '*/*';
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        const fileName = fileInput.files[0].name;
+        composerInput.value += ` [📎 ${fileName}]`;
+        composerInput.focus();
+      }
+    });
+    fileInput.click();
+  });
+
+  // Document attachment handling
+  docBtn.addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx';
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        const fileName = fileInput.files[0].name;
+        composerInput.value += ` [📄 ${fileName}]`;
+        composerInput.focus();
+      }
+    });
+    fileInput.click();
+  });
 
   // On resize
   window.addEventListener("resize", () => {
